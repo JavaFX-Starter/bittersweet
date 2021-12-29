@@ -1,0 +1,8 @@
+.k-button:armed,
+.k-button:hover,
+.k-button:focused,
+.k-button {
+    -fx-background-color: TRANSPARENT TRANSPARENT TRANSPARENT TRANSPARENT;
+    -fx-background-radius: 4px;
+    -fx-background-insets: 0px;
+}

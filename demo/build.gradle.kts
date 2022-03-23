@@ -24,9 +24,7 @@ dependencies {
     implementation(project(":lib"))
     implementation(libs.materialfx)
 
-    implementation(libs.log4j.api)
-    implementation(libs.log4j.core)
-    implementation(libs.log4j.slf4j.impl)
+    implementation(libs.bundles.log4j)
 }
 
 testing {

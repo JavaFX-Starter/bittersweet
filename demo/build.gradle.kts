@@ -37,5 +37,11 @@ testing {
     }
 }
 
+tasks.processResources {
+    filesMatching("application.properties") {
+        expand(project.properties)
+    }
+}
+
 group = "com.icuxika.bittersweet"
 version = libs.versions.project.version.get()

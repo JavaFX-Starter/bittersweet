@@ -23,6 +23,7 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import java.util.*
 import java.util.function.Function
 
 fun main(args: Array<String>) {
@@ -155,11 +156,17 @@ class MainApp : Application() {
             )
         }?.show()
 
-        L.trace("[trace]日志控制台输出");
-        L.debug("[debug]日志控制台输出");
-        L.info("[info]日志控制台输出");
-        L.warn("[warn]日志记录到build/application.log中");
-        L.error("[error]日志记录到build/application.log中");
+        L.trace("[trace]日志控制台输出")
+        L.debug("[debug]日志控制台输出")
+        L.info("[info]日志控制台输出")
+        L.warn("[warn]日志记录到build/application.log中")
+        L.error("[error]日志记录到build/application.log中")
+
+        javaClass.getResourceAsStream("/application.properties").use {
+            Properties().apply { load(it) }
+        }.let { properties ->
+            L.info("当前环境：${properties["environment"]}")
+        }
     }
 
     companion object {

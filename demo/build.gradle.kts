@@ -1,11 +1,8 @@
 plugins {
-    kotlin("jvm") version "1.6.10"
     application
-    id("org.openjfx.javafxplugin") version "0.0.10"
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.javafx)
 }
-
-group = "com.icuxika.bittersweet"
-version = "0.0.1"
 
 application {
     applicationName = "BitterSweetDemo"
@@ -17,20 +14,19 @@ repositories {
 }
 
 javafx {
-    version = "17"
+    version = libs.versions.javafx.version.get()
     modules("javafx.controls", "javafx.fxml")
 }
 
 dependencies {
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation(kotlin("stdlib"))
-
+    implementation(platform(libs.kotlin.bom))
+    implementation(libs.kotlin.stdlib)
     implementation(project(":lib"))
-    implementation("io.github.palexdev:materialfx:11.12.0")
+    implementation(libs.materialfx)
 
-    implementation("org.apache.logging.log4j:log4j-api:2.17.1")
-    implementation("org.apache.logging.log4j:log4j-core:2.17.1")
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.17.1")
+    implementation(libs.log4j.api)
+    implementation(libs.log4j.core)
+    implementation(libs.log4j.slf4j.impl)
 }
 
 testing {
@@ -40,3 +36,6 @@ testing {
         }
     }
 }
+
+group = "com.icuxika.bittersweet"
+version = libs.versions.project.version.get()

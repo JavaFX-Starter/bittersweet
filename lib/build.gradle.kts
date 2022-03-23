@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm") version "1.6.10"
     `java-library`
-    id("org.openjfx.javafxplugin") version "0.0.10"
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.javafx)
 }
 
 repositories {
@@ -9,16 +9,16 @@ repositories {
 }
 
 javafx {
-    version = "17"
+    version = libs.versions.javafx.version.get()
     modules("javafx.controls", "javafx.fxml")
     configuration = "compileOnly"
 }
 
 dependencies {
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation(kotlin("stdlib"))
-    implementation(kotlin("reflect"))
-    api("org.slf4j:slf4j-api:1.7.32")
+    implementation(platform(libs.kotlin.bom))
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.kotlin.reflect)
+    api(libs.slf4j.api)
 }
 
 testing {
@@ -28,3 +28,6 @@ testing {
         }
     }
 }
+
+group = "com.icuxika.bittersweet"
+version = libs.versions.project.version.get()

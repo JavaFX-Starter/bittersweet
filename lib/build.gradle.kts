@@ -27,13 +27,13 @@ dependencies {
     implementation(libs.kotlin.reflect)
     api(libs.slf4j.api)
 
-    implementation("org.openjfx:javafx-base:${libs.versions.javafx.version.get()}:${platform}")
-    implementation("org.openjfx:javafx-controls:${libs.versions.javafx.version.get()}:${platform}")
-    implementation("org.openjfx:javafx-graphics:${libs.versions.javafx.version.get()}:${platform}")
-    implementation("org.openjfx:javafx-fxml:${libs.versions.javafx.version.get()}:${platform}")
-    implementation("org.openjfx:javafx-swing:${libs.versions.javafx.version.get()}:${platform}")
-    implementation("org.openjfx:javafx-media:${libs.versions.javafx.version.get()}:${platform}")
-    implementation("org.openjfx:javafx-web:${libs.versions.javafx.version.get()}:${platform}")
+    compileOnly("org.openjfx:javafx-base:${libs.versions.javafx.version.get()}:${platform}")
+    compileOnly("org.openjfx:javafx-controls:${libs.versions.javafx.version.get()}:${platform}")
+    compileOnly("org.openjfx:javafx-graphics:${libs.versions.javafx.version.get()}:${platform}")
+    compileOnly("org.openjfx:javafx-fxml:${libs.versions.javafx.version.get()}:${platform}")
+    compileOnly("org.openjfx:javafx-swing:${libs.versions.javafx.version.get()}:${platform}")
+    compileOnly("org.openjfx:javafx-media:${libs.versions.javafx.version.get()}:${platform}")
+    compileOnly("org.openjfx:javafx-web:${libs.versions.javafx.version.get()}:${platform}")
 }
 
 val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks

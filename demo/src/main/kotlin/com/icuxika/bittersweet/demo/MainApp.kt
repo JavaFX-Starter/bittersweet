@@ -1,14 +1,17 @@
-package com.icuxika.bittersweet
+package com.icuxika.bittersweet.demo
 
 import com.icuxika.bittersweet.control.KButton
-import com.icuxika.bittersweet.dsl.*
-import com.icuxika.bittersweet.dsl.data.TableViewData
+import com.icuxika.bittersweet.demo.dsl.*
+import com.icuxika.bittersweet.demo.dsl.data.TableViewData
 import com.icuxika.bittersweet.extension.logger
 import io.github.palexdev.materialfx.controls.MFXButton
-import io.github.palexdev.materialfx.controls.MFXTableView
-import io.github.palexdev.materialfx.controls.cell.MFXTableColumn
+import io.github.palexdev.materialfx.controls.MFXPaginatedTableView
+import io.github.palexdev.materialfx.controls.MFXTableColumn
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell
-import io.github.palexdev.materialfx.controls.enums.ButtonType
+import io.github.palexdev.materialfx.enums.ButtonType
+import io.github.palexdev.materialfx.filter.EnumFilter
+import io.github.palexdev.materialfx.filter.LongFilter
+import io.github.palexdev.materialfx.filter.StringFilter
 import io.github.palexdev.materialfx.font.MFXFontIcon
 import javafx.application.Application
 import javafx.beans.binding.Bindings
@@ -58,18 +61,18 @@ class MainApp : Application() {
                                 }
                             ),
                             StackPane(
-                                MFXTableView(tableViewDataList).apply {
+                                MFXPaginatedTableView(tableViewDataList).apply {
                                     this.tableColumns.addAll(
                                         MFXTableColumn("Id", compareBy(TableViewData::getId)).apply {
-                                            rowCellFunction =
-                                                Function { data -> MFXTableRowCell(data.idProperty().asString()) }
+                                            rowCellFactory =
+                                                Function { MFXTableRowCell(TableViewData::getId) }
                                         },
                                         MFXTableColumn("Name", compareBy(TableViewData::getName)).apply {
-                                            rowCellFunction = Function { data -> MFXTableRowCell(data.nameProperty()) }
+                                            rowCellFactory = Function { MFXTableRowCell(TableViewData::getName) }
                                         },
                                         MFXTableColumn("State", compareBy(TableViewData::getState)).apply {
-                                            rowCellFunction = Function { data ->
-                                                MFXTableRowCell(data.stateProperty().asString().concat(" - 点击")).apply {
+                                            rowCellFactory = Function { data ->
+                                                MFXTableRowCell(TableViewData::getState).apply {
                                                     graphicTextGap = 4.0
                                                     leadingGraphic = MFXFontIcon("mfx-circle", 6.0).apply {
                                                         colorProperty().bind(Bindings.createObjectBinding({
@@ -97,6 +100,11 @@ class MainApp : Application() {
                                                 }
                                             }
                                         }
+                                    )
+                                    filters.addAll(
+                                        LongFilter("Id", TableViewData::getId),
+                                        StringFilter("Name", TableViewData::getName),
+                                        EnumFilter("State", TableViewData::getState, TableViewData.State::class.java)
                                     )
                                     repeat(10) { index ->
                                         tableViewDataList.add(TableViewData().apply {

@@ -1,11 +1,10 @@
-package com.icuxika.bittersweet.dsl.data
+package com.icuxika.bittersweet.demo.dsl.data
 
-import io.github.palexdev.materialfx.filter.IFilterable
 import javafx.beans.property.SimpleLongProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 
-class TableViewData : IFilterable {
+class TableViewData {
 
     private val id: SimpleLongProperty = SimpleLongProperty()
     fun idProperty(): SimpleLongProperty = id
@@ -21,8 +20,6 @@ class TableViewData : IFilterable {
     fun stateProperty(): SimpleObjectProperty<State> = state
     fun setState(value: State) = stateProperty().set(value)
     fun getState(): State = stateProperty().get()
-
-    override fun toFilterString() = getId().toString() + " " + getName()
 
     enum class State {
         ONLINE, OFFLINE

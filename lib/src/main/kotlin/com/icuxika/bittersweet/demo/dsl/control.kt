@@ -1,4 +1,4 @@
-package com.icuxika.bittersweet.dsl
+package com.icuxika.bittersweet.demo.dsl
 
 import javafx.beans.property.StringProperty
 import javafx.collections.ObservableList

@@ -52,11 +52,11 @@ group = "com.icuxika.bittersweet"
 version = libs.versions.project.version.get()
 
 tasks.compileJava {
-    options.release.set(17)
+    options.release.set(libs.versions.jvm.target.get().toInt())
 }
 
 tasks.compileKotlin {
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = libs.versions.jvm.target.get()
     }
 }

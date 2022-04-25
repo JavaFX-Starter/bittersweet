@@ -1,5 +1,6 @@
 [versions]
 project-version = "0.0.1"
+jvm-target = "17"
 
 plugin-kotlin-version = "1.6.10"
 

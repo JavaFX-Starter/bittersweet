@@ -1,8 +1,10 @@
 package com.icuxika.bittersweet.demo
 
 import com.icuxika.bittersweet.control.KButton
-import com.icuxika.bittersweet.demo.dsl.*
+import com.icuxika.bittersweet.delegate.getProperty
+import com.icuxika.bittersweet.delegate.property
 import com.icuxika.bittersweet.demo.dsl.data.TableViewData
+import com.icuxika.bittersweet.dsl.*
 import com.icuxika.bittersweet.extension.logger
 import io.github.palexdev.materialfx.controls.MFXButton
 import io.github.palexdev.materialfx.controls.MFXPaginatedTableView
@@ -35,16 +37,21 @@ fun main(args: Array<String>) {
 
 class MainApp : Application() {
 
+    lateinit var mfxPaginatedTableView: MFXPaginatedTableView<TableViewData>
+
+    private var buttonText by property("Button")
+    private fun buttonTextProperty() = getProperty(MainApp::buttonText)
+
     private val tableViewDataList = FXCollections.observableArrayList(
         TableViewData().apply {
-            setId(1L)
-            setName("一号")
-            setState(TableViewData.State.ONLINE)
+            id = 1L
+            name = "一号"
+            state = TableViewData.State.ONLINE
         },
         TableViewData().apply {
-            setId(2L)
-            setName("二号")
-            setState(TableViewData.State.OFFLINE)
+            id = 2L
+            name = "二号"
+            state = TableViewData.State.OFFLINE
         }
     )
 
@@ -63,26 +70,26 @@ class MainApp : Application() {
                             StackPane(
                                 MFXPaginatedTableView(tableViewDataList).apply {
                                     this.tableColumns.addAll(
-                                        MFXTableColumn("Id", compareBy(TableViewData::getId)).apply {
+                                        MFXTableColumn("Id", compareBy(TableViewData::id)).apply {
                                             rowCellFactory =
-                                                Function { MFXTableRowCell(TableViewData::getId) }
+                                                Function { MFXTableRowCell(TableViewData::id) }
                                         },
-                                        MFXTableColumn("Name", compareBy(TableViewData::getName)).apply {
-                                            rowCellFactory = Function { MFXTableRowCell(TableViewData::getName) }
+                                        MFXTableColumn("Name", compareBy(TableViewData::name)).apply {
+                                            rowCellFactory = Function { MFXTableRowCell(TableViewData::name) }
                                         },
-                                        MFXTableColumn("State", compareBy(TableViewData::getState)).apply {
+                                        MFXTableColumn("State", compareBy(TableViewData::state)).apply {
                                             rowCellFactory = Function { data ->
-                                                MFXTableRowCell(TableViewData::getState).apply {
+                                                MFXTableRowCell(TableViewData::state).apply {
                                                     graphicTextGap = 4.0
                                                     leadingGraphic = MFXFontIcon("mfx-circle", 6.0).apply {
                                                         colorProperty().bind(Bindings.createObjectBinding({
-                                                            if (data.getState() == TableViewData.State.ONLINE) Color.LIMEGREEN
+                                                            if (data.state == TableViewData.State.ONLINE) Color.LIMEGREEN
                                                             else Color.SALMON
                                                         }, data.stateProperty()))
                                                     }
                                                     borderProperty().bind(Bindings.createObjectBinding({
                                                         val borderColor =
-                                                            if (data.getState() == TableViewData.State.ONLINE) Color.LIMEGREEN
+                                                            if (data.state == TableViewData.State.ONLINE) Color.LIMEGREEN
                                                             else Color.SALMON
                                                         Border(
                                                             BorderStroke(
@@ -95,30 +102,36 @@ class MainApp : Application() {
                                                     }, data.stateProperty()))
                                                     addEventFilter(
                                                         MouseEvent.MOUSE_PRESSED
-                                                    ) { data.setState(if (data.getState() == TableViewData.State.ONLINE) TableViewData.State.OFFLINE else TableViewData.State.ONLINE) }
+                                                    ) {
+                                                        data.state =
+                                                            (if (data.state == TableViewData.State.ONLINE) TableViewData.State.OFFLINE else TableViewData.State.ONLINE)
+                                                    }
                                                     padding = Insets(0.0, 4.0, 0.0, 4.0)
                                                 }
                                             }
                                         }
                                     )
                                     filters.addAll(
-                                        LongFilter("Id", TableViewData::getId),
-                                        StringFilter("Name", TableViewData::getName),
-                                        EnumFilter("State", TableViewData::getState, TableViewData.State::class.java)
+                                        LongFilter("Id", TableViewData::id),
+                                        StringFilter("Name", TableViewData::name),
+                                        EnumFilter("State", TableViewData::state, TableViewData.State::class.java)
                                     )
                                     repeat(10) { index ->
                                         tableViewDataList.add(TableViewData().apply {
-                                            setId(index.toLong() + 3)
-                                            setName((1000..9999).random().toString())
-                                            setState(if (index % 2 == 0) TableViewData.State.ONLINE else TableViewData.State.OFFLINE)
+                                            id = index.toLong() + 3
+                                            name = (1000..9999).random().toString()
+                                            state =
+                                                if (index % 2 == 0) TableViewData.State.ONLINE else TableViewData.State.OFFLINE
                                         })
                                     }
+
+                                    mfxPaginatedTableView = this
                                 }
                             ),
                             StackPane(
                                 VBox(
                                     button<MFXButton> {
-                                        text = "MFX"
+                                        textProperty().bind(buttonTextProperty())
                                         buttonType = ButtonType.RAISED
                                         textFill = Color.WHITE
                                         background =
@@ -132,25 +145,27 @@ class MainApp : Application() {
                                         setPrefSize(84.0, 24.0)
 
                                         onAction {
-                                            tableViewDataList[0].setName("Two")
+                                            tableViewDataList[0].name = "Two"
+                                            buttonText = "按钮"
+                                            mfxPaginatedTableView.update()
                                         }
                                     },
                                     tableView0(tableViewDataList) {
                                         this column tableColumn0<TableViewData, Long>().bindProperty(
                                             SimpleStringProperty("序号"),
-                                            TableViewData::getId
+                                            TableViewData::id
                                         ).applyCellFactory {
                                             Pair(null, Button(it.toString()))
                                         }
                                         this column tableColumn0<TableViewData, String>().bindProperty(
                                             SimpleStringProperty("名称"),
-                                            TableViewData::getName
+                                            TableViewData::name
                                         ).applyCellFactory {
                                             Pair(null, Label(it))
                                         }
                                         this column tableColumn0<TableViewData, TableViewData.State>().bindProperty(
-                                            SimpleStringProperty("名称"),
-                                            TableViewData::getState
+                                            SimpleStringProperty("状态"),
+                                            TableViewData::state
                                         ).applyCellFactory {
                                             Pair(null, Label(it.toString()))
                                         }

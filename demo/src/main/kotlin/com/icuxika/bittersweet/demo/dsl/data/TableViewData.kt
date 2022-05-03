@@ -1,27 +1,21 @@
 package com.icuxika.bittersweet.demo.dsl.data
 
-import javafx.beans.property.SimpleLongProperty
-import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
+import com.icuxika.bittersweet.delegate.getProperty
+import com.icuxika.bittersweet.delegate.property
 
 class TableViewData {
 
-    private val id: SimpleLongProperty = SimpleLongProperty()
-    fun idProperty(): SimpleLongProperty = id
-    fun setId(value: Long) = idProperty().set(value)
-    fun getId(): Long = idProperty().get()
+    var id: Long by property()
+    fun idProperty() = getProperty(TableViewData::id)
 
-    private val name: SimpleStringProperty = SimpleStringProperty()
-    fun nameProperty(): SimpleStringProperty = name
-    fun setName(value: String) = nameProperty().set(value)
-    fun getName(): String = nameProperty().get()
+    var name: String by property()
+    fun nameProperty() = getProperty(TableViewData::name)
 
-    private val state: SimpleObjectProperty<State> = SimpleObjectProperty()
-    fun stateProperty(): SimpleObjectProperty<State> = state
-    fun setState(value: State) = stateProperty().set(value)
-    fun getState(): State = stateProperty().get()
+    var state: State by property()
+    fun stateProperty() = getProperty(TableViewData::state)
 
     enum class State {
         ONLINE, OFFLINE
     }
+
 }

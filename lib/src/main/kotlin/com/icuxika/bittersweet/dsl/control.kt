@@ -1,4 +1,4 @@
-package com.icuxika.bittersweet.demo.dsl
+package com.icuxika.bittersweet.dsl
 
 import javafx.beans.property.StringProperty
 import javafx.collections.ObservableList
@@ -8,7 +8,7 @@ import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.util.Callback
-import kotlin.reflect.KFunction1
+import kotlin.reflect.KMutableProperty1
 
 internal typealias Initializer<T> = T.() -> Unit
 
@@ -281,17 +281,17 @@ inline infix fun <reified T : TableView<U>, U> T.column(value: TableColumn<U, *>
 }
 
 inline fun <reified T : TableColumn<U, V>, U, V> T.bindProperty(
-    propertyGetFunc: KFunction1<U, V>
+    propertyGetFunc: KMutableProperty1<U, V>
 ) = this.apply {
-    this.cellValueFactory = PropertyValueFactory(propertyGetFunc.name.lowercase().replace("get", ""))
+    this.cellValueFactory = PropertyValueFactory(propertyGetFunc.name)
 }
 
 inline fun <reified T : TableColumn<U, V>, U, V> T.bindProperty(
     textProperty: StringProperty,
-    propertyGetFunc: KFunction1<U, V>
+    propertyGetFunc: KMutableProperty1<U, V>
 ) = this.apply {
     this.textProperty().bind(textProperty)
-    this.cellValueFactory = PropertyValueFactory(propertyGetFunc.name.lowercase().replace("get", ""))
+    this.cellValueFactory = PropertyValueFactory(propertyGetFunc.name)
 }
 
 fun <T : TableColumn<U, V>, U, V> T.applyCellFactory(block: (item: V) -> Pair<String?, Node?>) = this.apply {

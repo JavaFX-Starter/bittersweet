@@ -83,9 +83,9 @@ class MainApp : Application() {
 
         L.trace("[trace]日志控制台输出")
         L.debug("[debug]日志控制台输出")
-        L.info("[info]日志控制台输出")
-        L.warn("[warn]日志记录到build/application.log中")
-        L.error("[error]日志记录到build/application.log中")
+        L.info("[info]日志记录到logs/application.log中")
+        L.warn("[warn]日志记录到logs/application.log中")
+        L.error("[error]日志记录到logs/application.log中")
 
         javaClass.getResourceAsStream("/application.properties").use {
             Properties().apply { load(it) }

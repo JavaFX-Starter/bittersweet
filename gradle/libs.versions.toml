@@ -1,36 +1,45 @@
 [versions]
 project-version = "0.0.1"
-jvm-target = "17"
+jvm-target = "21"
+javafx-version = "21"
 
-plugin-kotlin-version = "1.6.10"
+kotlinx-coroutines-core-version = "1.8.0"
 
-plugin-javafx-version = "0.0.10"
-javafx-version = "17"
+slf4j2-version = "2.0.12"
+log4j-version = "2.23.0"
+logback-version = "1.5.3"
+
 materialfx-version = "11.13.5"
 
-slf4j-version = "1.7.36"
-log4j-version = "2.17.2"
+plugin-kotlin-jvm-version = "1.9.23"
 
 [libraries]
 # bom
 kotlin-bom = { group = "org.jetbrains.kotlin", name = "kotlin-bom" }
-
 # kotlin
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect" }
+kotlin-test-junit5 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5" }
+
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core-version" }
+kotlinx-coroutines-javafx = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-javafx", version.ref = "kotlinx-coroutines-core-version" }
 
 # javafx
 materialfx = { group = "io.github.palexdev", name = "materialfx", version.ref = "materialfx-version" }
 
 # log
-slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j-version" }
+slf4j2-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j2-version" }
+# log - log4j
 log4j-api = { group = "org.apache.logging.log4j", name = "log4j-api", version.ref = "log4j-version" }
 log4j-core = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j-version" }
-log4j-slf4j-impl = { group = "org.apache.logging.log4j", name = "log4j-slf4j-impl", version.ref = "log4j-version" }
+log4j-slf4j2-impl = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl", version.ref = "log4j-version" }
+# log - logback
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback-version" }
+logback-core = { group = "ch.qos.logback", name = "logback-core", version.ref = "logback-version" }
 
 [bundles]
-log4j = ["log4j-api", "log4j-core", "log4j-slf4j-impl"]
+log4j = ["log4j-api", "log4j-core", "log4j-slf4j2-impl"]
+logback = ["log4j-api", "logback-classic", "logback-core"]
 
 [plugins]
-kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "plugin-kotlin-version" }
-javafx = { id = "org.openjfx.javafxplugin", version.ref = "plugin-javafx-version" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "plugin-kotlin-jvm-version" }

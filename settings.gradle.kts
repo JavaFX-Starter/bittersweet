@@ -1,3 +1,3 @@
 rootProject.name = "bittersweet"
-include("lib")
+include("bittersweet")
 include("demo")

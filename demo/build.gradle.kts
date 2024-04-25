@@ -5,6 +5,7 @@ import org.gradle.internal.os.OperatingSystem
 plugins {
     alias(libs.plugins.kotlin.jvm)
     application
+    alias(libs.plugins.beryx.jlink)
 }
 
 application {
@@ -57,7 +58,12 @@ compileKotlin.destinationDirectory.set(compileJava.destinationDirectory)
 
 tasks.test {
     useJUnitPlatform()
-    jvmArgs = listOf("-Dfile.encoding=UTF-8", "-Dkotlinx.coroutines.debug", "-Dsun.stdout.encoding=UTF-8", "-Dsun.stderr.encoding=UTF-8")
+    jvmArgs = listOf(
+        "-Dfile.encoding=UTF-8",
+        "-Dkotlinx.coroutines.debug",
+        "-Dsun.stdout.encoding=UTF-8",
+        "-Dsun.stderr.encoding=UTF-8"
+    )
     testLogging {
         exceptionFormat = FULL
         showExceptions = true
@@ -83,5 +89,41 @@ tasks.compileJava {
 tasks.compileKotlin {
     kotlinOptions {
         jvmTarget = libs.versions.jvm.target.get()
+    }
+}
+
+jlink {
+    options.set(listOf("--strip-debug", "--compress", "zip-9", "--no-header-files", "--no-man-pages"))
+    launcher {
+        name = application.applicationName
+        imageName = application.applicationName
+    }
+    mergedModule {
+        requires("java.naming")
+    }
+    jpackage {
+        imageName = application.applicationName
+        installerName = application.applicationName
+        appVersion = version.toString()
+        jvmArgs = listOf()
+
+        when {
+            OperatingSystem.current().isWindows -> {
+                installerOptions = listOf(
+                    "--win-dir-chooser",
+                    "--win-menu",
+                    "--win-menu-group",
+                    application.applicationName,
+                    "--win-per-user-install",
+                    "--win-shortcut",
+                    "--win-shortcut-prompt",
+                    "--win-upgrade-uuid",
+                    "fd5b16cf-e0a9-4ef4-abc8-73d396fecf6d"
+                )
+            }
+
+            OperatingSystem.current().isMacOsX -> {}
+            OperatingSystem.current().isLinux -> {}
+        }
     }
 }

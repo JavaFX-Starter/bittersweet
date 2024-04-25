@@ -1,0 +1,6 @@
+@import "../main.css";
+
+#test-button {
+    -fx-background-color: dodgerblue;
+    -fx-text-fill: white;
+}

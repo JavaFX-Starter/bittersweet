@@ -1,7 +1,6 @@
-@import "bittersweet.css";
+@import "../main.css";
 
 #test-button {
-    -fx-font-size: 2em;
     -fx-background-color: skyblue;
     -fx-text-fill: black;
 }

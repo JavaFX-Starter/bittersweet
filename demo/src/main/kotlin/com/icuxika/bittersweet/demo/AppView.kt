@@ -58,12 +58,9 @@ class AppView<T : Any>(controllerClass: KClass<T>) {
             AppResource.appThemeProperty().subscribe { newTheme ->
                 newTheme?.let {
                     sceneViewMap.forEach { (s, v) ->
-                        val light = "css/$v.css"
-                        val dark = "css/$v-dark.css"
-                        s.stylesheets.removeAll(
-                            AppResource.loadURL(light)?.toExternalForm(),
-                            AppResource.loadURL(dark)?.toExternalForm()
-                        )
+                        val light = "css/light/$v-light.css"
+                        val dark = "css/dark/$v-dark.css"
+                        s.stylesheets.clear()
                         if (it == Theme.LIGHT) {
                             s.stylesheets.add(AppResource.loadURL(light)?.toExternalForm())
                         } else {

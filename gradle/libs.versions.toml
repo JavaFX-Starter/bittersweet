@@ -12,6 +12,7 @@ logback-version = "1.5.3"
 materialfx-version = "11.17.0"
 
 plugin-kotlin-jvm-version = "1.9.23"
+plugin-beryx-jlink-version = "3.0.1"
 
 [libraries]
 # bom
@@ -43,3 +44,4 @@ logback = ["log4j-api", "logback-classic", "logback-core"]
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "plugin-kotlin-jvm-version" }
+beryx-jlink = { id = "org.beryx.jlink", version.ref = "plugin-beryx-jlink-version" }

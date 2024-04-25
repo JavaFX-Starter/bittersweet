@@ -57,7 +57,7 @@ compileKotlin.destinationDirectory.set(compileJava.destinationDirectory)
 
 tasks.test {
     useJUnitPlatform()
-    jvmArgs = listOf("-Dfile.encoding=UTF-8", "-Dkotlinx.coroutines.debug", "-Dsun.stdout.encoding=UTF-8")
+    jvmArgs = listOf("-Dfile.encoding=UTF-8", "-Dkotlinx.coroutines.debug", "-Dsun.stdout.encoding=UTF-8", "-Dsun.stderr.encoding=UTF-8")
     testLogging {
         exceptionFormat = FULL
         showExceptions = true

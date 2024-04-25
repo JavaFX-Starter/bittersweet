@@ -1,5 +1,6 @@
 package com.icuxika.bittersweet.demo
 
+import com.icuxika.bittersweet.demo.MainApp.Companion.LOGGER
 import com.icuxika.bittersweet.demo.controller.MainController
 import com.icuxika.bittersweet.extension.logger
 import io.github.palexdev.materialfx.theming.JavaFXThemes
@@ -10,6 +11,11 @@ import javafx.stage.Stage
 import java.util.*
 
 fun main(args: Array<String>) {
+    MainApp.Companion::class.java.getResourceAsStream("/application.properties").use {
+        Properties().apply { load(it) }
+    }.let { properties ->
+        LOGGER.info("当前环境：${properties["environment"]}")
+    }
     Application.launch(MainApp::class.java, *args)
 }
 
@@ -28,12 +34,6 @@ class MainApp : Application() {
 
         primaryStage?.apply {
             mainView.setStage(this).show()
-        }?.show()
-
-        javaClass.getResourceAsStream("/application.properties").use {
-            Properties().apply { load(it) }
-        }.let { properties ->
-            LOGGER.info("当前环境：${properties["environment"]}")
         }
     }
 

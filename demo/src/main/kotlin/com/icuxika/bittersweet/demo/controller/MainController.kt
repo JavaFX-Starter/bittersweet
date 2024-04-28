@@ -1,6 +1,7 @@
 package com.icuxika.bittersweet.demo.controller
 
 import com.icuxika.bittersweet.demo.AppResource
+import com.icuxika.bittersweet.demo.AppView
 import com.icuxika.bittersweet.demo.annotation.AppFXML
 import com.icuxika.bittersweet.demo.system.Theme
 import com.icuxika.bittersweet.demo.util.FileDownloader
@@ -20,6 +21,7 @@ import javafx.geometry.Pos
 import javafx.scene.control.Button
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
+import javafx.stage.Stage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
@@ -40,7 +42,7 @@ class MainController : Initializable {
     private val progressProperty = SimpleDoubleProperty(0.5)
     private val scope = CoroutineScope(Dispatchers.JavaFx)
 
-    override fun initialize(p0: URL?, p1: ResourceBundle?) {
+    override fun initialize(location: URL?, resources: ResourceBundle?) {
         container.center = VBox(
             MFXProgressBar().apply {
                 progressProperty().bind(progressProperty)
@@ -74,6 +76,7 @@ class MainController : Initializable {
 
                                 is FileDownloader.DownloadState.Success -> {
                                     LOGGER.info("下载完成[${Thread.currentThread().name}]-->${it.result}")
+                                    LOGGER.info("文件保存路径->$filePath")
                                 }
 
                                 is FileDownloader.DownloadState.Error -> {
@@ -87,6 +90,11 @@ class MainController : Initializable {
             MFXTextField("123"),
             Button("中国智造").apply {
                 id = "test-button"
+                onAction {
+                    val letsPlotView = AppView(LetsPlotController::class)
+                    letsPlotView.show()
+                    (container.scene.window as Stage).close()
+                }
             }
         ).apply {
             alignment = Pos.CENTER

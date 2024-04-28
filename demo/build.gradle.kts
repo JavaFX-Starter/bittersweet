@@ -5,17 +5,19 @@ import org.gradle.internal.os.OperatingSystem
 plugins {
     alias(libs.plugins.kotlin.jvm)
     application
-    alias(libs.plugins.beryx.jlink)
 }
 
 application {
     applicationName = "BitterSweetDemo"
-    mainModule.set("bittersweet.demo")
     mainClass.set("com.icuxika.bittersweet.demo.MainAppKt")
-    applicationDefaultJvmArgs = listOf("-Dsun.stdout.encoding=UTF-8", "-Dkotlinx.coroutines.debug")
+    applicationDefaultJvmArgs =
+        listOf("-Dsun.stdout.encoding=UTF-8", "-Dsun.stderr.encoding=UTF-8", "-Dkotlinx.coroutines.debug")
 }
 
 repositories {
+    maven {
+        url = uri("https://repo.osgeo.org/repository/release")
+    }
     mavenCentral()
 }
 
@@ -38,9 +40,12 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.test.junit5)
+    implementation(libs.kotlinx.dataframe)
     implementation(project(":bittersweet"))
+
     implementation(libs.materialfx)
 
+    implementation(libs.bundles.lets.plot)
     implementation(libs.bundles.logback)
 
     implementation("org.openjfx:javafx-base:${libs.versions.javafx.version.get()}:${platform}")
@@ -89,41 +94,5 @@ tasks.compileJava {
 tasks.compileKotlin {
     kotlinOptions {
         jvmTarget = libs.versions.jvm.target.get()
-    }
-}
-
-jlink {
-    options.set(listOf("--strip-debug", "--compress", "zip-9", "--no-header-files", "--no-man-pages"))
-    launcher {
-        name = application.applicationName
-        imageName = application.applicationName
-    }
-    mergedModule {
-        requires("java.naming")
-    }
-    jpackage {
-        imageName = application.applicationName
-        installerName = application.applicationName
-        appVersion = version.toString()
-        jvmArgs = listOf()
-
-        when {
-            OperatingSystem.current().isWindows -> {
-                installerOptions = listOf(
-                    "--win-dir-chooser",
-                    "--win-menu",
-                    "--win-menu-group",
-                    application.applicationName,
-                    "--win-per-user-install",
-                    "--win-shortcut",
-                    "--win-shortcut-prompt",
-                    "--win-upgrade-uuid",
-                    "fd5b16cf-e0a9-4ef4-abc8-73d396fecf6d"
-                )
-            }
-
-            OperatingSystem.current().isMacOsX -> {}
-            OperatingSystem.current().isLinux -> {}
-        }
     }
 }

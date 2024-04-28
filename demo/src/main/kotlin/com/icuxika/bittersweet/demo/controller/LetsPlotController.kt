@@ -2,8 +2,8 @@ package com.icuxika.bittersweet.demo.controller
 
 import com.icuxika.bittersweet.demo.annotation.AppFXML
 import com.icuxika.bittersweet.demo.component.LayoutAnimator
-import com.icuxika.bittersweet.demo.dataset.AliYunDataVDataSet
-import com.icuxika.bittersweet.demo.dataset.NaturalEarthDataSet
+import com.icuxika.bittersweet.demo.dataset.ChinaAdminDivisionSHPDataset
+import com.icuxika.bittersweet.demo.dataset.NaturalEarthDataset
 import com.icuxika.bittersweet.dsl.onAction
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
@@ -23,8 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.geotools.data.shapefile.ShapefileDataStoreFactory
-import org.geotools.filter.text.cql2.CQL
 import org.geotools.geometry.jts.ReferencedEnvelope
 import org.geotools.referencing.crs.DefaultGeographicCRS
 import org.jetbrains.kotlinx.dataframe.DataFrame
@@ -142,10 +140,45 @@ class LetsPlotController : Initializable {
 
         container.center = scrollPane
 
+        addChinaAdminDivisionSHP()
+
+        repeat(1) {
+            scope.launch {
+                plotsContainer.children.add(createPlotSpecsNode {
+                    withStrokeAndSpacerLines()
+                })
+            }
+        }
+    }
+
+    private fun addChinaAdminDivisionSHP() {
+        scope.launch {
+            plotsContainer.children.add(createPlotSpecsNode {
+                val spatialDataset = ChinaAdminDivisionSHPDataset.country
+                val p = letsPlot() + geomPolygon(
+                    map = spatialDataset,
+                ) {} + ggtitle("中国-国家")
+                p.toSpec()
+            })
+        }
+        scope.launch {
+            plotsContainer.children.add(createPlotSpecsNode(Dimension(1500, 1000)) {
+                val spatialDataset = ChinaAdminDivisionSHPDataset.province
+                val p = letsPlot() + geomPolygon(
+                    map = spatialDataset,
+                ) {
+                    fill = "pr_name"
+                } + ggtitle("中国-省/直辖市")
+                p.toSpec()
+            })
+        }
+    }
+
+    fun addNaturalEarth() {
         scope.launch {
             plotsContainer.children.add(
                 createPlotSpecsNode(Dimension(1360, 768)) {
-                    val (polygonSpatialDataset, _) = NaturalEarthDataSet.naturalEarth110mCulturalVectorsCountries
+                    val (polygonSpatialDataset, _) = NaturalEarthDataset.naturalEarth110mCulturalVectorsCountries
                     val p = letsPlot() + geomPolygon(
                         map = polygonSpatialDataset,
                         color = "white",
@@ -161,7 +194,7 @@ class LetsPlotController : Initializable {
         scope.launch {
             plotsContainer.children.add(
                 createPlotSpecsNode(Dimension(1360, 768)) {
-                    val (polygonSpatialDataset, cnPolygonSpatialDataset) = NaturalEarthDataSet.naturalEarth110mCulturalVectorsCountries
+                    val (polygonSpatialDataset, cnPolygonSpatialDataset) = NaturalEarthDataset.naturalEarth110mCulturalVectorsCountries
                     val p = letsPlot() + geomPolygon(
                         map = polygonSpatialDataset,
                         color = "white",
@@ -180,7 +213,7 @@ class LetsPlotController : Initializable {
         scope.launch {
             plotsContainer.children.add(
                 createPlotSpecsNode(Dimension(1360, 768)) {
-                    val (polygonSpatialDataset, _) = NaturalEarthDataSet.naturalEarth110mCulturalVectorsCountries
+                    val (polygonSpatialDataset, _) = NaturalEarthDataset.naturalEarth110mCulturalVectorsCountries
                     val envelope = ReferencedEnvelope(
                         -85.41094255239946, -30.729993455533034,  // longitudes
                         -59.61183, 16.43730316817731,             // latitudes
@@ -204,7 +237,7 @@ class LetsPlotController : Initializable {
         scope.launch {
             plotsContainer.children.add(
                 createPlotSpecsNode(Dimension(1360, 768)) {
-                    val (polygonSpatialDataset, _) = NaturalEarthDataSet.naturalEarth110mCulturalVectorsCountries
+                    val (polygonSpatialDataset, _) = NaturalEarthDataset.naturalEarth110mCulturalVectorsCountries
                     val climateData = mapOf(
                         "region" to listOf("Europe", "Asia", "North America", "Africa", "Australia", "Oceania"),
                         "avg_temp" to listOf(8.6, 16.6, 11.7, 21.9, 14.9, 23.9)
@@ -226,7 +259,7 @@ class LetsPlotController : Initializable {
         scope.launch {
             plotsContainer.children.add(
                 createPlotSpecsNode {
-                    val citiesSpatialDataset = NaturalEarthDataSet.naturalEarth10mCulturalVectorsPopulatedPlaces
+                    val citiesSpatialDataset = NaturalEarthDataset.naturalEarth10mCulturalVectorsPopulatedPlaces
                     val p = letsPlot() + geomPoint(
                         data = citiesSpatialDataset,
                         color = "red"
@@ -234,27 +267,6 @@ class LetsPlotController : Initializable {
                     p.toSpec()
                 }
             )
-        }
-
-        scope.launch {
-            plotsContainer.children.add(createPlotSpecsNode(Dimension(1360, 768)) {
-                val spatialDataset = AliYunDataVDataSet.areasV3CN
-                val p = letsPlot() + geomPolygon(
-                    map = spatialDataset,
-                    color = "red"
-                ) {
-                    fill = "name"
-                } + ggtitle("中国-省")
-                p.toSpec()
-            })
-        }
-
-        repeat(1) {
-            scope.launch {
-                plotsContainer.children.add(createPlotSpecsNode {
-                    withStrokeAndSpacerLines()
-                })
-            }
         }
     }
 

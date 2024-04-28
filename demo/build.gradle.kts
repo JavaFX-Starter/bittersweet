@@ -57,10 +57,6 @@ dependencies {
     implementation("org.openjfx:javafx-web:${libs.versions.javafx.version.get()}:${platform}")
 }
 
-val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-val compileJava: JavaCompile by tasks
-compileKotlin.destinationDirectory.set(compileJava.destinationDirectory)
-
 tasks.test {
     useJUnitPlatform()
     jvmArgs = listOf(

@@ -1,3 +1,6 @@
+import com.icuxika.bittersweet.demo.dataset.AliYunDataVDataset
+import com.icuxika.bittersweet.demo.dataset.ChinaAdminDivisionSHPDataset
+import com.icuxika.bittersweet.demo.dataset.NaturalEarthDataset
 import org.geotools.data.shapefile.ShapefileDataStoreFactory
 import org.geotools.filter.text.cql2.CQL
 import org.geotools.geojson.geom.GeometryJSON
@@ -9,11 +12,7 @@ class GeoToolsTest {
 
     @Test
     fun test() {
-        val params = hashMapOf<String, String>()
-        params[ShapefileDataStoreFactory.URLP.key] =
-            "file:" + "NaturalEarth/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp"
-        val dataStore = ShapefileDataStoreFactory().createDataStore(params)
-        val simpleFeatureCollection = dataStore.getFeatureSource(dataStore.names[0]).features
+        val simpleFeatureCollection = NaturalEarthDataset.readShapeFile("ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp")
         val sub = simpleFeatureCollection.subCollection(CQL.toFilter("CONTINENT NOT LIKE 'Africa'"))
             .subCollection(CQL.toFilter("NAME_ZH = '中华人民共和国'"))
         println(sub.toSpatialDataset()["NAME_ZH"]?.distinct())
@@ -32,12 +31,8 @@ class GeoToolsTest {
 
     @Test
     fun read110mCulturalVectorsCountries() {
-        val params = hashMapOf<String, String>()
-        params[ShapefileDataStoreFactory.URLP.key] =
-            "file:" + "NaturalEarth/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp"
-        val dataStore = ShapefileDataStoreFactory().createDataStore(params)
-        val simpleFeatureCollection = dataStore.getFeatureSource(dataStore.names[0]).features
-        val spatialDataset = simpleFeatureCollection.toSpatialDataset()
+        val simpleFeatureCollection = NaturalEarthDataset.readShapeFile("ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp")
+        val (spatialDataset, _) = NaturalEarthDataset.naturalEarth110mCulturalVectorsCountries
         println(spatialDataset["NAME_ZH"]?.distinct())
         println(spatialDataset["CONTINENT"]?.distinct())
         spatialDataset["CONTINENT"]?.let { continent ->
@@ -86,24 +81,13 @@ class GeoToolsTest {
 
     @Test
     fun read10mCulturalVectorsPopulatedPlaces() {
-        val params = hashMapOf<String, String>()
-        params[ShapefileDataStoreFactory.URLP.key] =
-            "file:" + "NaturalEarth/ne_10m_populated_places/ne_10m_populated_places.shp"
-        val dataStore = ShapefileDataStoreFactory().createDataStore(params)
-        val simpleFeatureCollection = dataStore.getFeatureSource(dataStore.names[0]).features
-        val spatialDataset = simpleFeatureCollection.toSpatialDataset()
+        val spatialDataset = NaturalEarthDataset.naturalEarth110mCulturalVectorsBoundaryLines
         println(spatialDataset.keys)
     }
 
     @Test
     fun read110mCulturalVectorsBoundaryLines() {
-        val params = hashMapOf<String, String>()
-        params[ShapefileDataStoreFactory.URLP.key] =
-            "file:" + "NaturalEarth/ne_110m_admin_0_boundary_lines_land/ne_110m_admin_0_boundary_lines_land.shp"
-        val dataStore = ShapefileDataStoreFactory().createDataStore(params)
-        val simpleFeatureCollection = dataStore.getFeatureSource(dataStore.names[0]).features
-        println(simpleFeatureCollection.schema)
-        val spatialDataset = simpleFeatureCollection.toSpatialDataset()
+        val (spatialDataset, _) = NaturalEarthDataset.naturalEarth110mCulturalVectorsCountries
         spatialDataset["FCLASS_CN"]?.let { data ->
             println(data)
         }
@@ -126,23 +110,28 @@ class GeoToolsTest {
      */
     @Test
     fun readAliYunDataV() {
-        val params = hashMapOf<String, String>()
-        params[ShapefileDataStoreFactory.URLP.key] =
-            "file:" + "C:\\Users\\icuxika\\Downloads\\sp\\sp.shp"
-        val dataStore = ShapefileDataStoreFactory().createDataStore(params)
-        val simpleFeatureCollection = dataStore.getFeatureSource(dataStore.names[0]).features
-//        simpleFeatureCollection.features().let {
-//            while (it.hasNext()) {
-//                val simpleFeature = it.next()
-//                simpleFeature.properties.forEach { property ->
-//                    println("${property.name}-->${property.type}-->${property.value}")
-//                }
-//                val geometry = simpleFeature.defaultGeometry
-//                println(geometry)
-//            }
-//        }
-        val spatialDataset = simpleFeatureCollection.toSpatialDataset()
+        val spatialDataset = AliYunDataVDataset.areasV3CN
         println(spatialDataset.keys)
         println(spatialDataset["name"]?.distinct())
+    }
+
+    @Test
+    fun readChinaAdminDivisionSHPCountry() {
+        val spatialDataset = ChinaAdminDivisionSHPDataset.country
+        println(spatialDataset.keys)
+        println(spatialDataset["cn_name"]?.distinct())
+    }
+
+    @Test
+    fun readChinaAdminDivisionSHPProvince() {
+        val spatialDataset = ChinaAdminDivisionSHPDataset.province
+        println(spatialDataset.keys)
+        println(spatialDataset["pr_name"]?.distinct())
+    }
+
+    @Test
+    fun readChinaAdminDivisionSHPCity() {
+        val spatialDataset = ChinaAdminDivisionSHPDataset.city
+        println(spatialDataset.keys)
     }
 }

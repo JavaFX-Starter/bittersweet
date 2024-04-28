@@ -5,15 +5,15 @@ javafx-version = "22"
 
 kotlinx-coroutines-core-version = "1.8.0"
 kotlinx-dataframe-version = "0.13.1"
+kotlinx-datetime-jvm-version = "0.5.0"
 
 slf4j2-version = "2.0.12"
 log4j-version = "2.23.0"
 logback-version = "1.5.3"
 
 materialfx-version = "11.17.0"
-lets-plot-jfx-version = "4.3.2"
-lets-plot-kotlin-jvm-version = "4.7.2"
-lets-plot-kotlin-geotools-version = "4.7.2"
+lets-plot-version = "4.3.2"
+lets-plot-kotlin-version = "4.7.2"
 geotools-version = "30.1"
 
 plugin-kotlin-jvm-version = "1.9.23"
@@ -30,14 +30,15 @@ kotlin-test-junit5 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core-version" }
 kotlinx-coroutines-javafx = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-javafx", version.ref = "kotlinx-coroutines-core-version" }
 kotlinx-dataframe = { group = "org.jetbrains.kotlinx", name = "dataframe", version.ref = "kotlinx-dataframe-version" }
+kotlinx-datetime-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime-jvm", version.ref = "kotlinx-datetime-jvm-version" }
 
 # javafx ui
 materialfx = { group = "io.github.palexdev", name = "materialfx", version.ref = "materialfx-version" }
 
 # Lets-Plot
-lets-plot-jfx = { group = "org.jetbrains.lets-plot", name = "lets-plot-jfx", version.ref = "lets-plot-jfx-version" }
-lets-plot-kotlin-jvm = { group = "org.jetbrains.lets-plot", name = "lets-plot-kotlin-jvm", version.ref = "lets-plot-kotlin-jvm-version" }
-lets-plot-kotlin-geotools = { group = "org.jetbrains.lets-plot", name = "lets-plot-kotlin-geotools", version.ref = "lets-plot-kotlin-geotools-version" }
+lets-plot-jfx = { group = "org.jetbrains.lets-plot", name = "lets-plot-jfx", version.ref = "lets-plot-version" }
+lets-plot-kotlin-jvm = { group = "org.jetbrains.lets-plot", name = "lets-plot-kotlin-jvm", version.ref = "lets-plot-kotlin-version" }
+lets-plot-kotlin-geotools = { group = "org.jetbrains.lets-plot", name = "lets-plot-kotlin-geotools", version.ref = "lets-plot-kotlin-version" }
 gt-shapefile = { group = "org.geotools", name = "gt-shapefile", version.ref = "geotools-version" }
 gt-geojson = { group = "org.geotools", name = "gt-geojson", version.ref = "geotools-version" }
 gt-cql = { group = "org.geotools", name = "gt-cql", version.ref = "geotools-version" }

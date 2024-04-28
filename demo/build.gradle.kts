@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.test.junit5)
     implementation(libs.kotlinx.dataframe)
+    implementation(libs.kotlinx.datetime.jvm)
     implementation(project(":bittersweet"))
 
     implementation(libs.materialfx)

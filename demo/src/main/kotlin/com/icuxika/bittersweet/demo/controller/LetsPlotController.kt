@@ -140,7 +140,7 @@ class LetsPlotController : Initializable {
 
         container.center = scrollPane
 
-        addChinaAdminDivisionSHP()
+        addNaturalEarth()
 
         repeat(1) {
             scope.launch {

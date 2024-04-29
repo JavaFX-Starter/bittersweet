@@ -2,6 +2,7 @@ package com.icuxika.bittersweet.demo.controller
 
 import com.icuxika.bittersweet.demo.annotation.AppFXML
 import com.icuxika.bittersweet.demo.component.LayoutAnimator
+import com.icuxika.bittersweet.demo.dataset.AliYunDataVDataset
 import com.icuxika.bittersweet.demo.dataset.ChinaAdminDivisionSHPDataset
 import com.icuxika.bittersweet.demo.dataset.NaturalEarthDataset
 import com.icuxika.bittersweet.dsl.onAction
@@ -23,6 +24,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.geotools.api.feature.simple.SimpleFeature
+import org.geotools.api.feature.simple.SimpleFeatureType
+import org.geotools.api.feature.type.GeometryDescriptor
+import org.geotools.geojson.feature.FeatureJSON
+import org.geotools.geojson.geom.GeometryJSON
 import org.geotools.geometry.jts.ReferencedEnvelope
 import org.geotools.referencing.crs.DefaultGeographicCRS
 import org.jetbrains.kotlinx.dataframe.DataFrame
@@ -42,8 +48,11 @@ import org.jetbrains.letsPlot.label.ggtitle
 import org.jetbrains.letsPlot.letsPlot
 import org.jetbrains.letsPlot.toolkit.geotools.toSpatialDataset
 import org.jetbrains.letsPlot.tooltips.layerTooltips
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.util.GeometryFixer
 import java.awt.Component
 import java.awt.Dimension
+import java.io.File
 import java.io.FileInputStream
 import java.net.URL
 import java.util.*
@@ -140,7 +149,7 @@ class LetsPlotController : Initializable {
 
         container.center = scrollPane
 
-        addNaturalEarth()
+        addAliYunDataV()
 
         repeat(1) {
             scope.launch {
@@ -148,6 +157,31 @@ class LetsPlotController : Initializable {
                     withStrokeAndSpacerLines()
                 })
             }
+        }
+    }
+
+    private fun addAliYunDataV() {
+        scope.launch {
+            plotsContainer.children.add(createPlotSpecsNode(Dimension(1500, 1000)) {
+                val spatialDataset = AliYunDataVDataset.areasV3CNFromJson
+                val p = letsPlot() + geomPolygon(
+                    map = spatialDataset,
+                ) {
+                    fill = "name"
+                } + ggtitle("中国-省/直辖市-JSON")
+                p.toSpec()
+            })
+        }
+        scope.launch {
+            plotsContainer.children.add(createPlotSpecsNode(Dimension(1500, 1000)) {
+                val spatialDataset = AliYunDataVDataset.areasV3CN
+                val p = letsPlot() + geomPolygon(
+                    map = spatialDataset,
+                ) {
+                    fill = "name"
+                } + ggtitle("中国-省/直辖市")
+                p.toSpec()
+            })
         }
     }
 
@@ -174,7 +208,7 @@ class LetsPlotController : Initializable {
         }
     }
 
-    fun addNaturalEarth() {
+    private fun addNaturalEarth() {
         scope.launch {
             plotsContainer.children.add(
                 createPlotSpecsNode(Dimension(1360, 768)) {

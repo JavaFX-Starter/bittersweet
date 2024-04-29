@@ -1,11 +1,22 @@
 import com.icuxika.bittersweet.demo.dataset.AliYunDataVDataset
 import com.icuxika.bittersweet.demo.dataset.ChinaAdminDivisionSHPDataset
 import com.icuxika.bittersweet.demo.dataset.NaturalEarthDataset
+import org.geotools.api.feature.simple.SimpleFeature
+import org.geotools.api.feature.simple.SimpleFeatureType
+import org.geotools.api.feature.type.GeometryDescriptor
 import org.geotools.data.shapefile.ShapefileDataStoreFactory
 import org.geotools.filter.text.cql2.CQL
+import org.geotools.geojson.feature.FeatureJSON
 import org.geotools.geojson.geom.GeometryJSON
+import org.geotools.geometry.jts.JTS
+import org.jetbrains.letsPlot.core.spec.remove
 import org.jetbrains.letsPlot.spatial.SpatialDataset
 import org.jetbrains.letsPlot.toolkit.geotools.toSpatialDataset
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.MultiPolygon
+import org.locationtech.jts.geom.util.GeometryFixer
+import java.io.File
+import java.nio.channels.Channels
 import kotlin.test.Test
 
 class GeoToolsTest {
@@ -133,5 +144,30 @@ class GeoToolsTest {
     fun readChinaAdminDivisionSHPCity() {
         val spatialDataset = ChinaAdminDivisionSHPDataset.city
         println(spatialDataset.keys)
+    }
+
+    @Test
+    fun readAliYunDataVJson() {
+        File("Dataset/AliYunDataV/scripts/中华人民共和国.json").let { file ->
+            FeatureJSON(GeometryJSON(6)).readFeatureCollection(file).let { featureCollection ->
+                val attributeDescriptors = (featureCollection.schema as SimpleFeatureType).attributeDescriptors
+                val geometryAttribute = attributeDescriptors?.find { it is GeometryDescriptor }
+                    ?: throw IllegalArgumentException("No geometry attribute")
+                featureCollection.features().use {
+                    while (it.hasNext()) {
+                        val feature = it.next()
+                        require(feature is SimpleFeature)
+                        val featureGeometry = feature.getAttribute(geometryAttribute.name)
+                        require(featureGeometry is Geometry)
+                        if (!featureGeometry.isValid) {
+                            val fixedGeometry = GeometryFixer.fix(featureGeometry)
+                            feature.setAttribute(geometryAttribute.name, fixedGeometry)
+                        }
+                    }
+                }
+                val spatialDataset = featureCollection.toSpatialDataset(10)
+                println(spatialDataset.keys)
+            }
+        }
     }
 }

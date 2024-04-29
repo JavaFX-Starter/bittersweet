@@ -1,7 +1,7 @@
 import geopandas
 from shapely.geometry import GeometryCollection
 
-geoDataFrameFromJson = geopandas.read_file("中华人民共和国.json")
+geoDataFrameFromJson = geopandas.read_file("中华人民共和国_原始数据.json")
 geoDataFrameFromJson.to_file(driver="ESRI Shapefile", filename="cache", encoding="utf-8")
 
 initGeoDataFrame = geopandas.read_file("cache")

@@ -49,6 +49,7 @@ class AppView<T : Any>(controllerClass: KClass<T>) {
         sceneViewMap[scene!!] = id
         stage!!.scene = scene
         stage!!.show()
+        reloadStylesheets(scene!!, id, AppResource.getTheme())
     }
 
     companion object {
@@ -58,14 +59,22 @@ class AppView<T : Any>(controllerClass: KClass<T>) {
             AppResource.appThemeProperty().subscribe { newTheme ->
                 newTheme?.let {
                     sceneViewMap.forEach { (s, v) ->
-                        val light = "css/light/$v-light.css"
-                        val dark = "css/dark/$v-dark.css"
-                        s.stylesheets.clear()
-                        if (it == Theme.LIGHT) {
-                            s.stylesheets.add(AppResource.loadURL(light)?.toExternalForm())
-                        } else {
-                            s.stylesheets.add(AppResource.loadURL(dark)?.toExternalForm())
-                        }
+                        reloadStylesheets(s, v, it)
+                    }
+                }
+            }
+        }
+
+        fun reloadStylesheets(scene: Scene, id: String, theme: Theme) {
+            val light = "css/light/$id-light.css"
+            val dark = "css/dark/$id-dark.css"
+            AppResource.loadURL(light)?.let { lightStylesheet ->
+                AppResource.loadURL(dark)?.let { darkStylesheet ->
+                    scene.stylesheets.clear()
+                    if (theme == Theme.LIGHT) {
+                        scene.stylesheets.add(lightStylesheet.toExternalForm())
+                    } else {
+                        scene.stylesheets.add(darkStylesheet.toExternalForm())
                     }
                 }
             }

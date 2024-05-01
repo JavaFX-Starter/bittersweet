@@ -1,0 +1,142 @@
+package com.icuxika.bittersweet.demo.api
+
+import com.google.gson.reflect.TypeToken
+import com.icuxika.bittersweet.demo.api.Api.HTTPRequestMethod
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import okio.use
+import java.io.BufferedInputStream
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.nio.file.Path
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+
+/**
+ * Get请求，最好设置为不允许通过请求体传参
+ */
+suspend inline fun <reified T> suspendGet(
+    url: String,
+    data: Any? = null,
+) = suspendCancellableCoroutine { cancellableContinuation ->
+    val type = object : TypeToken<T>() {}.type
+    Api.request<T>(type, url, HTTPRequestMethod.GET, data)
+        .success {
+            cancellableContinuation.resume(it)
+        }.failure {
+            cancellableContinuation.resumeWithException(it)
+        }.execute()
+}
+
+/**
+ * Post请求
+ */
+suspend inline fun <reified T> suspendPost(
+    url: String,
+    data: Any? = null,
+) = suspendCancellableCoroutine { cancellableContinuation ->
+    val type = object : TypeToken<T>() {}.type
+    Api.request<T>(type, url, HTTPRequestMethod.POST, data)
+        .success {
+            cancellableContinuation.resume(it)
+        }.failure {
+            cancellableContinuation.resumeWithException(it)
+        }.execute()
+}
+
+sealed class ProgressFlowState {
+    data class Progress(val progress: Float) : ProgressFlowState()
+    data class Success(val result: Any? = null) : ProgressFlowState()
+    data class Error(val throwable: Throwable) : ProgressFlowState()
+}
+
+/**
+ * 获取文件流并保存到指定Path
+ */
+suspend fun suspendGetFileFlow(
+    url: String,
+    filePath: Path,
+    data: Any? = null,
+) = callbackFlow {
+    val result = runCatching {
+        suspendCancellableCoroutine { cancellableContinuation ->
+            val type = object : TypeToken<Pair<InputStream, Long>>() {}.type
+            Api.request<Pair<InputStream, Long>>(type, url, HTTPRequestMethod.GET, data)
+                .success {
+                    cancellableContinuation.resume(it)
+                }.failure {
+                    cancellableContinuation.resumeWithException(it)
+                }.stream()
+        }
+    }
+    result.getOrNull()?.let { pair ->
+        val (inputStream, contentLength) = pair
+        BufferedInputStream(inputStream).use { bufferedInputStream ->
+            FileOutputStream(filePath.toFile()).use { fileOutputStream ->
+                val buffer = ByteArray(1024)
+                var bytesAllRead = 0
+                var bytesRead: Int
+                while (bufferedInputStream.read(buffer).also { bytesRead = it } != -1) {
+                    fileOutputStream.write(buffer, 0, bytesRead)
+                    bytesAllRead += bytesRead
+                    if (contentLength == 1L) {
+                        trySend(ProgressFlowState.Progress(-1.0f))
+                    } else {
+                        trySend(
+                            ProgressFlowState.Progress(
+                                (bytesAllRead * 1.0f / contentLength).coerceIn(0.0f, 1.0f)
+                            )
+                        )
+                    }
+                }
+                fileOutputStream.flush()
+                send(ProgressFlowState.Success(0))
+            }
+        }
+    }
+    result.exceptionOrNull()?.let {
+        send(ProgressFlowState.Error(it))
+    }
+    close()
+    awaitClose { }
+}
+
+/**
+ * 上传文件并同时监听进度，监听器会在请求真正发起之前就被调用
+ */
+suspend inline fun <reified T> suspendPostFileFlow(
+    url: String,
+    data: Any? = null,
+) = callbackFlow<ProgressFlowState> {
+    val result = runCatching {
+        suspendCancellableCoroutine { cancellableContinuation ->
+            val type = object : TypeToken<T>() {}.type
+            Api.request<T>(type, url, HTTPRequestMethod.POST, mutableMapOf<String, Any>(
+                Api.REQUEST_KEY_LISTENER to object : RequestListener {
+                    override fun invoke(workDone: Long, max: Long) {
+                        trySend(ProgressFlowState.Progress(workDone.toFloat() / max))
+                    }
+                }
+            ).apply {
+                @Suppress("UNCHECKED_CAST")
+                (data as? Map<String, Any>)?.forEach { (k, v) ->
+                    this[k] = v
+                }
+            })
+                .success {
+                    cancellableContinuation.resume(it)
+                }.failure {
+                    cancellableContinuation.resumeWithException(it)
+                }.execute()
+        }
+    }
+    result.getOrNull()?.let {
+        send(ProgressFlowState.Success(it))
+    }
+    result.exceptionOrNull()?.let {
+        send(ProgressFlowState.Error(it))
+    }
+    close()
+    awaitClose { }
+}

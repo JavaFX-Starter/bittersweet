@@ -11,7 +11,15 @@ application {
     applicationName = "BitterSweetDemo"
     mainClass.set("com.icuxika.bittersweet.demo.MainAppKt")
     applicationDefaultJvmArgs =
-        listOf("-Dsun.stdout.encoding=UTF-8", "-Dsun.stderr.encoding=UTF-8", "-Dkotlinx.coroutines.debug")
+        listOf(
+            "-XX:+PrintCommandLineFlags",
+            "-XX:+UseZGC",
+            "-XX:+ZGenerational",
+            "-Xlog:gc:logs/gc.log",
+            "-Dsun.stdout.encoding=UTF-8",
+            "-Dsun.stderr.encoding=UTF-8",
+            "-Dkotlinx.coroutines.debug"
+        )
 }
 
 repositories {
@@ -39,7 +47,8 @@ dependencies {
     implementation(platform(libs.kotlin.bom))
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
-    implementation(libs.kotlin.test.junit5)
+    testImplementation(libs.kotlin.test.junit5)
+    testImplementation(libs.kotlinx.coroutines.test)
     implementation(libs.kotlinx.dataframe)
     implementation(libs.kotlinx.datetime.jvm)
     implementation(project(":bittersweet"))
@@ -48,6 +57,7 @@ dependencies {
 
     implementation(libs.bundles.lets.plot)
     implementation(libs.bundles.logback)
+    implementation(libs.bundles.okhttp)
 
     implementation("org.openjfx:javafx-base:${libs.versions.javafx.version.get()}:${platform}")
     implementation("org.openjfx:javafx-controls:${libs.versions.javafx.version.get()}:${platform}")

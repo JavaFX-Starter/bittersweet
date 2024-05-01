@@ -1,14 +1,17 @@
 package com.icuxika.bittersweet.demo
 
+import com.icuxika.bittersweet.demo.i18n.ObservableResourceBundleFactory
 import com.icuxika.bittersweet.demo.system.Theme
 import javafx.application.ColorScheme
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import java.net.URL
+import java.util.*
 
 object AppResource {
 
     private val appTheme = SimpleObjectProperty<Theme>()
+
     fun appThemeProperty(): SimpleObjectProperty<Theme> {
         return appTheme
     }
@@ -26,9 +29,23 @@ object AppResource {
         return theme
     }
 
+    fun getTheme(): Theme = theme.get()
+
     fun setTheme(value: Theme) {
         theme.set(value)
     }
+
+    private const val LANGUAGE_RESOURCE_NAME = "LanguageResource"
+
+    val SUPPORT_LANGUAGE_LIST = listOf(Locale.SIMPLIFIED_CHINESE, Locale.ENGLISH)
+
+    private val LANGUAGE_RESOURCE_FACTORY = ObservableResourceBundleFactory()
+
+    fun setLanguage(locale: Locale) {
+        LANGUAGE_RESOURCE_FACTORY.setResourceBundle(ResourceBundle.getBundle(LANGUAGE_RESOURCE_NAME, locale))
+    }
+
+    fun getLanguageBinding(key: String) = LANGUAGE_RESOURCE_FACTORY.getStringBinding(key)
 
     init {
         // 监听主题变化

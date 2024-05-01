@@ -33,6 +33,8 @@ class MainApp : Application() {
         val mainView = AppView(MainController::class)
 
         primaryStage?.apply {
+            AppResource.setLanguage(Locale.SIMPLIFIED_CHINESE)
+            titleProperty().bind(AppResource.getLanguageBinding("title"))
             mainView.setStage(this).show()
         }
     }

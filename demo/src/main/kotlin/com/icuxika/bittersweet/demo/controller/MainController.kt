@@ -8,9 +8,7 @@ import com.icuxika.bittersweet.demo.util.FileDownloader
 import com.icuxika.bittersweet.dsl.onAction
 import com.icuxika.bittersweet.extension.logger
 import io.github.palexdev.materialfx.controls.MFXButton
-import io.github.palexdev.materialfx.controls.MFXComboBox
 import io.github.palexdev.materialfx.controls.MFXProgressBar
-import io.github.palexdev.materialfx.controls.MFXTextField
 import io.github.palexdev.materialfx.enums.ButtonType
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.collections.FXCollections
@@ -19,6 +17,7 @@ import javafx.fxml.Initializable
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.Button
+import javafx.scene.control.ComboBox
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.stage.Stage
@@ -43,18 +42,19 @@ class MainController : Initializable {
     private val scope = CoroutineScope(Dispatchers.JavaFx)
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
+        container.sceneProperty().addListener { _, oldScene, newScene ->
+            if (oldScene == null && newScene != null) {
+                newScene.windowProperty().addListener { _, oldWindow, newWindow ->
+                    if (oldWindow == null && newWindow != null) {
+                        println(123)
+                    }
+                }
+            }
+        }
+
         container.center = VBox(
             MFXProgressBar().apply {
                 progressProperty().bind(progressProperty)
-            },
-            MFXComboBox<Theme>().apply {
-                items = FXCollections.observableArrayList(Theme.entries)
-                selectItem(Theme.LIGHT)
-                valueProperty().subscribe { newTheme ->
-                    newTheme?.let {
-                        AppResource.setTheme(it)
-                    }
-                }
             },
             MFXButton("下载").apply {
                 setPrefSize(120.0, 36.0)
@@ -87,8 +87,23 @@ class MainController : Initializable {
                     }
                 }
             },
-            MFXTextField("123"),
-            Button("中国智造").apply {
+            ComboBox(FXCollections.observableArrayList(Theme.entries)).apply {
+                valueProperty().subscribe { newTheme ->
+                    newTheme?.let {
+                        AppResource.setTheme(it)
+                    }
+                }
+                selectionModel.select(Theme.LIGHT)
+            },
+            ComboBox(FXCollections.observableArrayList(AppResource.SUPPORT_LANGUAGE_LIST)).apply {
+                valueProperty().subscribe { newLocale ->
+                    newLocale?.let {
+                        AppResource.setLanguage(it)
+                    }
+                }
+                selectionModel.select(Locale.SIMPLIFIED_CHINESE)
+            },
+            Button("图表").apply {
                 id = "test-button"
                 onAction {
                     val letsPlotView = AppView(LetsPlotController::class)

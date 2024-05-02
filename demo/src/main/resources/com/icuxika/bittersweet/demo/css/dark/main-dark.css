@@ -1,6 +1,6 @@
 @import "../main.css";
 
-#test-button {
+.test-button {
     -fx-background-color: skyblue;
     -fx-text-fill: black;
 }

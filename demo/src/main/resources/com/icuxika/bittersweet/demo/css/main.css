@@ -1,5 +1,5 @@
 @import "bittersweet.css";
 
-#test-button {
+.test-button {
     -fx-font-size: 2em;
 }

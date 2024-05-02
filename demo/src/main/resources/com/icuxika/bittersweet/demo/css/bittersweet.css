@@ -1,6 +1,6 @@
 @import "../fonts/Fonts.css";
 
-* {
-    -fx-font-family: "HarmonyOS Sans";
+.demo {
+    -fx-font-family: "HarmonyOS Sans SC";
     -fx-font-size: 1.5em;
 }

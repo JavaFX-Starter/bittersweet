@@ -1,18 +1,18 @@
 package com.icuxika.bittersweet.demo.system
 
-enum class Theme {
+enum class Theme(val value: String) {
     /**
      * 跟随系统
      */
-    SYSTEM,
+    SYSTEM("system"),
 
     /**
      * 明亮主题
      */
-    LIGHT,
+    LIGHT("light"),
 
     /**
      * 暗黑主题
      */
-    DARK
+    DARK("dark")
 }

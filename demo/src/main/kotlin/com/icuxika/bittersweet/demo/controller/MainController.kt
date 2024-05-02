@@ -17,12 +17,11 @@ import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.control.Button
-import javafx.scene.control.ComboBox
-import javafx.scene.control.ProgressIndicator
+import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import javafx.util.Callback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
@@ -60,7 +59,7 @@ class MainController : Initializable {
                 progressProperty().bind(progressProperty)
             },
             MFXButton("下载").apply {
-                setPrefSize(120.0, 36.0)
+                styleClass.add("test-button")
                 buttonType = ButtonType.FLAT
                 textFill = Color.WHITE
                 background = Background(BackgroundFill(Color.DODGERBLUE, CornerRadii(4.0), Insets.EMPTY))
@@ -97,6 +96,21 @@ class MainController : Initializable {
                     }
                 }
                 valueProperty().bindBidirectional(AppResource.themeProperty())
+                cellFactory = Callback<ListView<Theme>, ListCell<Theme>> {
+                    object : ListCell<Theme>() {
+                        override fun updateItem(item: Theme?, empty: Boolean) {
+                            super.updateItem(item, empty)
+                            graphic = if (item == null || empty) {
+                                null
+                            } else {
+                                Label().apply {
+                                    textProperty().bind(AppResource.getLanguageBinding(item.value))
+                                }
+                            }
+                        }
+                    }
+                }
+                buttonCell = cellFactory.call(null)
             },
             ComboBox(FXCollections.observableArrayList(AppResource.SUPPORT_LANGUAGE_LIST)).apply {
                 valueProperty().subscribe { newLocale ->
@@ -105,9 +119,29 @@ class MainController : Initializable {
                     }
                 }
                 valueProperty().bindBidirectional(AppResource.localeProperty())
+                cellFactory = Callback<ListView<Locale>, ListCell<Locale>> {
+                    object : ListCell<Locale>() {
+                        override fun updateItem(item: Locale?, empty: Boolean) {
+                            super.updateItem(item, empty)
+                            graphic = if (item == null || empty) {
+                                null
+                            } else {
+                                val key = when (item) {
+                                    Locale.SIMPLIFIED_CHINESE -> "lang_zh_CN"
+                                    Locale.ENGLISH -> "lang_en"
+                                    else -> throw IllegalArgumentException("不支持的语言[${item.displayName}]")
+                                }
+                                Label().apply {
+                                    textProperty().bind(AppResource.getLanguageBinding(key))
+                                }
+                            }
+                        }
+                    }
+                }
+                buttonCell = cellFactory.call(null)
             },
             Button("图表").apply {
-                id = "test-button"
+                styleClass.add("test-button")
                 onAction {
                     val letsPlotView = AppView(LetsPlotController::class)
                     letsPlotView.show()

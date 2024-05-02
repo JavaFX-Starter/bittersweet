@@ -1,5 +1,7 @@
 package com.icuxika.bittersweet.demo.util
 
+import com.icuxika.bittersweet.demo.api.ProgressFlowState
+import javafx.scene.control.ProgressIndicator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,14 +18,13 @@ import java.nio.file.Path
  * 使用Flow来实现文件下载的逻辑
  */
 object FileDownloader {
-    suspend fun downloadFile(fileURL: String, filePath: Path): Flow<DownloadState> {
+    suspend fun downloadFile(fileURL: String, filePath: Path): Flow<ProgressFlowState> {
         return flow {
             val byteBuffer = ByteBuffer.allocate(1024)
             runCatching {
                 URI(fileURL).toURL()
                     .let { url: URL ->
-                        val total = contentLength(url)
-                        println("file size: $total")
+                        val contentLength = getContentLength(url)
                         FileOutputStream(filePath.toFile()).use { fileOutputStream ->
                             Channels.newChannel(url.openStream()).use { channel ->
                                 var bytesAllRead = 0
@@ -34,23 +35,27 @@ object FileDownloader {
                                     byteBuffer.get(byteArray)
                                     fileOutputStream.write(byteArray)
                                     bytesAllRead += bytesRead
-                                    emit(
-                                        DownloadState.Downloading(
-                                            (bytesAllRead.toFloat() / total).coerceIn(
-                                                0.0f,
-                                                1.0f
+                                    if (contentLength == ProgressIndicator.INDETERMINATE_PROGRESS) {
+                                        emit(ProgressFlowState.Success(contentLength))
+                                    } else {
+                                        emit(
+                                            ProgressFlowState.Progress(
+                                                (bytesAllRead.toDouble() / contentLength).coerceIn(
+                                                    0.0,
+                                                    1.0
+                                                )
                                             )
                                         )
-                                    )
+                                    }
                                     byteBuffer.clear()
                                 }
                                 fileOutputStream.flush()
-                                emit(DownloadState.Success(0))
+                                emit(ProgressFlowState.Success(0))
                             }
                         }
                     }
             }.onFailure {
-                emit(DownloadState.Error(it))
+                emit(ProgressFlowState.Error(it))
             }
         }.flowOn(Dispatchers.IO)
     }
@@ -58,35 +63,16 @@ object FileDownloader {
     /**
      * 获取文件大小
      */
-    private fun contentLength(url: URL): Int {
-        var contentLength = -1
+    private fun getContentLength(url: URL): Double {
+        var contentLength = ProgressIndicator.INDETERMINATE_PROGRESS
         runCatching {
             HttpURLConnection.setFollowRedirects(false)
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "HEAD"
-            contentLength = connection.contentLength
+            contentLength = connection.contentLength.toDouble()
             connection.disconnect()
         }
         return contentLength
     }
 
-    /**
-     * 下载状态
-     */
-    sealed class DownloadState {
-        /**
-         * 下载中
-         */
-        data class Downloading(val progress: Float) : DownloadState()
-
-        /**
-         * 下载成功
-         */
-        data class Success(val result: Int) : DownloadState()
-
-        /**
-         * 下载失败
-         */
-        data class Error(val throwable: Throwable) : DownloadState()
-    }
 }

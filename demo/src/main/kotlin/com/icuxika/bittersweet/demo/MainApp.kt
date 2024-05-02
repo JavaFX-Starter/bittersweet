@@ -2,6 +2,7 @@ package com.icuxika.bittersweet.demo
 
 import com.icuxika.bittersweet.demo.MainApp.Companion.LOGGER
 import com.icuxika.bittersweet.demo.controller.MainController
+import com.icuxika.bittersweet.demo.system.Theme
 import com.icuxika.bittersweet.extension.logger
 import io.github.palexdev.materialfx.theming.JavaFXThemes
 import io.github.palexdev.materialfx.theming.MaterialFXStylesheets
@@ -33,6 +34,7 @@ class MainApp : Application() {
         val mainView = AppView(MainController::class)
 
         primaryStage?.apply {
+            AppResource.setTheme(Theme.LIGHT)
             AppResource.setLanguage(Locale.SIMPLIFIED_CHINESE)
             titleProperty().bind(AppResource.getLanguageBinding("title"))
             mainView.setStage(this).show()

@@ -2,6 +2,7 @@ package com.icuxika.bittersweet.demo.api
 
 import com.google.gson.reflect.TypeToken
 import com.icuxika.bittersweet.demo.api.Api.HTTPRequestMethod
+import javafx.scene.control.ProgressIndicator
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -46,7 +47,7 @@ suspend inline fun <reified T> suspendPost(
 }
 
 sealed class ProgressFlowState {
-    data class Progress(val progress: Float) : ProgressFlowState()
+    data class Progress(val progress: Double) : ProgressFlowState()
     data class Success(val result: Any? = null) : ProgressFlowState()
     data class Error(val throwable: Throwable) : ProgressFlowState()
 }
@@ -61,8 +62,8 @@ suspend fun suspendGetFileFlow(
 ) = callbackFlow {
     val result = runCatching {
         suspendCancellableCoroutine { cancellableContinuation ->
-            val type = object : TypeToken<Pair<InputStream, Long>>() {}.type
-            Api.request<Pair<InputStream, Long>>(type, url, HTTPRequestMethod.GET, data)
+            val type = object : TypeToken<Pair<InputStream, Double>>() {}.type
+            Api.request<Pair<InputStream, Double>>(type, url, HTTPRequestMethod.GET, data)
                 .success {
                     cancellableContinuation.resume(it)
                 }.failure {
@@ -80,12 +81,12 @@ suspend fun suspendGetFileFlow(
                 while (bufferedInputStream.read(buffer).also { bytesRead = it } != -1) {
                     fileOutputStream.write(buffer, 0, bytesRead)
                     bytesAllRead += bytesRead
-                    if (contentLength == 1L) {
-                        trySend(ProgressFlowState.Progress(-1.0f))
+                    if (contentLength == ProgressIndicator.INDETERMINATE_PROGRESS) {
+                        trySend(ProgressFlowState.Progress(contentLength))
                     } else {
                         trySend(
                             ProgressFlowState.Progress(
-                                (bytesAllRead * 1.0f / contentLength).coerceIn(0.0f, 1.0f)
+                                (bytesAllRead.toDouble() / contentLength).coerceIn(0.0, 1.0)
                             )
                         )
                     }
@@ -115,7 +116,7 @@ suspend inline fun <reified T> suspendPostFileFlow(
             Api.request<T>(type, url, HTTPRequestMethod.POST, mutableMapOf<String, Any>(
                 Api.REQUEST_KEY_LISTENER to object : RequestListener {
                     override fun invoke(workDone: Long, max: Long) {
-                        trySend(ProgressFlowState.Progress(workDone.toFloat() / max))
+                        trySend(ProgressFlowState.Progress(workDone.toDouble() / max))
                     }
                 }
             ).apply {

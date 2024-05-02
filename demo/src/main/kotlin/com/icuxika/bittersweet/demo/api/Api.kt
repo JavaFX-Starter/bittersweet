@@ -3,6 +3,7 @@ package com.icuxika.bittersweet.demo.api
 import com.google.gson.reflect.TypeToken
 import com.icuxika.bittersweet.demo.api.Api.HTTPRequestMethod
 import com.icuxika.bittersweet.demo.util.Global.gson
+import javafx.scene.control.ProgressIndicator
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -193,7 +194,8 @@ class ApiExecutor<T>(private val request: Request, private val type: Type) {
         if (responseBody == null) {
             doFailure(RuntimeException("请求响应体中没有文件数据"))
         } else {
-            val contentLength: Long = response.header("CONTENT-LENGTH", "1")?.toLong() ?: 1
+            val contentLength: Double =
+                response.header("CONTENT-LENGTH")?.toDouble() ?: ProgressIndicator.INDETERMINATE_PROGRESS
             @Suppress("UNCHECKED_CAST")
             doSuccess(Pair(responseBody.byteStream(), contentLength) as T)
         }

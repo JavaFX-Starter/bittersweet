@@ -3,6 +3,7 @@ package com.icuxika.bittersweet.demo.controller
 import com.icuxika.bittersweet.demo.AppResource
 import com.icuxika.bittersweet.demo.AppView
 import com.icuxika.bittersweet.demo.annotation.AppFXML
+import com.icuxika.bittersweet.demo.api.ProgressFlowState
 import com.icuxika.bittersweet.demo.system.Theme
 import com.icuxika.bittersweet.demo.util.FileDownloader
 import com.icuxika.bittersweet.dsl.onAction
@@ -18,6 +19,7 @@ import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
+import javafx.scene.control.ProgressIndicator
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.stage.Stage
@@ -38,15 +40,16 @@ class MainController : Initializable {
     @FXML
     private lateinit var container: BorderPane
 
-    private val progressProperty = SimpleDoubleProperty(0.5)
     private val scope = CoroutineScope(Dispatchers.JavaFx)
+
+    private val progressProperty = SimpleDoubleProperty(ProgressIndicator.INDETERMINATE_PROGRESS)
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         container.sceneProperty().addListener { _, oldScene, newScene ->
             if (oldScene == null && newScene != null) {
                 newScene.windowProperty().addListener { _, oldWindow, newWindow ->
                     if (oldWindow == null && newWindow != null) {
-                        println(123)
+                        // stage initialized
                     }
                 }
             }
@@ -70,16 +73,16 @@ class MainController : Initializable {
                                 .resolve("result1.exe");
                         FileDownloader.downloadFile(fileURL, filePath).collect {
                             when (it) {
-                                is FileDownloader.DownloadState.Downloading -> {
-                                    progressProperty.set(it.progress.toDouble())
+                                is ProgressFlowState.Progress -> {
+                                    progressProperty.set(it.progress)
                                 }
 
-                                is FileDownloader.DownloadState.Success -> {
+                                is ProgressFlowState.Success -> {
                                     LOGGER.info("下载完成[${Thread.currentThread().name}]-->${it.result}")
                                     LOGGER.info("文件保存路径->$filePath")
                                 }
 
-                                is FileDownloader.DownloadState.Error -> {
+                                is ProgressFlowState.Error -> {
                                     LOGGER.info("下载失败[${Thread.currentThread().name}]-->${it.throwable.message}")
                                 }
                             }
@@ -93,7 +96,7 @@ class MainController : Initializable {
                         AppResource.setTheme(it)
                     }
                 }
-                selectionModel.select(Theme.LIGHT)
+                valueProperty().bindBidirectional(AppResource.themeProperty())
             },
             ComboBox(FXCollections.observableArrayList(AppResource.SUPPORT_LANGUAGE_LIST)).apply {
                 valueProperty().subscribe { newLocale ->
@@ -101,7 +104,7 @@ class MainController : Initializable {
                         AppResource.setLanguage(it)
                     }
                 }
-                selectionModel.select(Locale.SIMPLIFIED_CHINESE)
+                valueProperty().bindBidirectional(AppResource.localeProperty())
             },
             Button("图表").apply {
                 id = "test-button"

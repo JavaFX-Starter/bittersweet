@@ -8,9 +8,14 @@ import com.icuxika.bittersweet.demo.system.Theme
 import com.icuxika.bittersweet.demo.util.FileDownloader
 import com.icuxika.bittersweet.dsl.onAction
 import com.icuxika.bittersweet.extension.logger
-import io.github.palexdev.materialfx.controls.MFXButton
-import io.github.palexdev.materialfx.controls.MFXProgressBar
+import io.github.palexdev.materialfx.controls.*
+import io.github.palexdev.materialfx.controls.cell.MFXComboBoxCell
 import io.github.palexdev.materialfx.enums.ButtonType
+import io.github.palexdev.materialfx.enums.FloatMode
+import io.github.palexdev.materialfx.i18n.I18N
+import io.github.palexdev.mfxresources.fonts.MFXFontIcon
+import io.github.palexdev.virtualizedfx.cell.Cell
+import javafx.beans.binding.When
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
@@ -22,6 +27,7 @@ import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 import javafx.util.Callback
+import javafx.util.StringConverter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
@@ -29,6 +35,7 @@ import kotlinx.coroutines.launch
 import java.net.URL
 import java.nio.file.Path
 import java.util.*
+import java.util.function.Function
 
 @AppFXML(fxml = "fxml/main.fxml")
 class MainController : Initializable {
@@ -90,11 +97,6 @@ class MainController : Initializable {
                 }
             },
             ComboBox(FXCollections.observableArrayList(Theme.entries)).apply {
-                valueProperty().subscribe { newTheme ->
-                    newTheme?.let {
-                        AppResource.setTheme(it)
-                    }
-                }
                 valueProperty().bindBidirectional(AppResource.themeProperty())
                 cellFactory = Callback<ListView<Theme>, ListCell<Theme>> {
                     object : ListCell<Theme>() {
@@ -139,6 +141,74 @@ class MainController : Initializable {
                     }
                 }
                 buttonCell = cellFactory.call(null)
+            },
+            object : MFXComboBox<Theme>(FXCollections.observableArrayList(Theme.entries)) {
+                override fun defaultContextMenu() {
+                    val selectFirst =
+                        MFXContextMenuItem.Builder.build().setIcon(MFXFontIcon("fas-backward-fast", 16.0)).setOnAction {
+                            this.selectFirst()
+                        }.get().apply {
+                            textProperty().bind(I18N.getBinding("comboBox.contextMenu.selectFirst"))
+                        }
+                    val selectNext =
+                        MFXContextMenuItem.Builder.build().setIcon(MFXFontIcon("fas-forward", 16.0)).setOnAction {
+                            this.selectNext()
+                        }.get().apply {
+                            textProperty().bind(I18N.getBinding("comboBox.contextMenu.selectNext"))
+                        }
+                    val selectPrevious =
+                        MFXContextMenuItem.Builder.build().setIcon(MFXFontIcon("fas-backward", 16.0)).setOnAction {
+                            this.selectPrevious()
+                        }.get().apply {
+                            textProperty().bind(I18N.getBinding("comboBox.contextMenu.selectPrevious"))
+                        }
+                    val selectLast =
+                        MFXContextMenuItem.Builder.build().setIcon(MFXFontIcon("fas-forward-fast", 16.0)).setOnAction {
+                            this.selectLast()
+                        }.get().apply {
+                            textProperty().bind(I18N.getBinding("comboBox.contextMenu.selectLast"))
+                        }
+                    val resetSelection =
+                        MFXContextMenuItem.Builder.build().setIcon(MFXFontIcon("fas-xmark", 16.0)).setOnAction {
+                            this.clearSelection()
+                        }.get().apply {
+                            textProperty().bind(I18N.getBinding("comboBox.contextMenu.clearSelection"))
+                        }
+                    this.contextMenu =
+                        MFXContextMenu.Builder.build(this).addItems(selectFirst, selectNext, selectPrevious, selectLast)
+                            .addLineSeparator().addItem(resetSelection).installAndGet()
+                }
+            }.apply {
+                floatMode = FloatMode.BORDER
+                floatingTextProperty().bind(
+                    When(
+                        AppResource.localeProperty().isEqualTo(Locale.SIMPLIFIED_CHINESE)
+                    ).then("主题").otherwise("theme")
+                )
+                valueProperty().bindBidirectional(AppResource.themeProperty())
+                converter = object : StringConverter<Theme>() {
+                    override fun toString(`object`: Theme?): String {
+                        `object`?.let {
+                            return AppResource.getLanguageBinding(it.value).get()
+                        } ?: return ""
+                    }
+
+                    override fun fromString(string: String?): Theme {
+                        throw UnsupportedOperationException()
+                    }
+                }
+                // buttonCell = cellFactory.call(null) 没有发现MFXComboBox中对应的操作
+            }.also { mfxComboBox ->
+                mfxComboBox.cellFactory =
+                    Function<Theme, Cell<Theme>> { t ->
+                        object : MFXComboBoxCell<Theme>(mfxComboBox, t) {
+                            override fun render(data: Theme?) {
+                                children.setAll(Label().apply {
+                                    textProperty().bind(AppResource.getLanguageBinding(t.value))
+                                })
+                            }
+                        }
+                    }
             },
             Button("图表").apply {
                 styleClass.add("test-button")

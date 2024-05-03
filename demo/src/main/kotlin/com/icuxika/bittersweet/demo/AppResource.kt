@@ -2,6 +2,8 @@ package com.icuxika.bittersweet.demo
 
 import com.icuxika.bittersweet.demo.i18n.ObservableResourceBundleFactory
 import com.icuxika.bittersweet.demo.system.Theme
+import io.github.palexdev.materialfx.i18n.I18N
+import io.github.palexdev.materialfx.i18n.Language
 import javafx.application.ColorScheme
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
@@ -65,6 +67,10 @@ object AppResource {
      * 设置语言
      */
     fun setLanguage(locale: Locale) {
+        when (locale) {
+            Locale.SIMPLIFIED_CHINESE -> I18N.setLanguage(Language.SIMPLIFIED_CHINESE)
+            Locale.ENGLISH -> I18N.setLanguage(Language.ENGLISH)
+        }
         setLocale(locale)
         LANGUAGE_RESOURCE_FACTORY.setResourceBundle(ResourceBundle.getBundle(LANGUAGE_RESOURCE_NAME, locale))
     }

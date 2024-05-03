@@ -4,3 +4,13 @@
     -fx-font-family: "HarmonyOS Sans SC";
     -fx-font-size: 1.5em;
 }
+
+.mfx-text-field {
+    -fx-font-family: "HarmonyOS Sans SC";
+    -fx-font-size: 1.5em;
+}
+
+.mfx-combo-box-cell .data-label {
+    -fx-font-family: "HarmonyOS Sans SC";
+    -fx-font-size: 1.5em;
+}

@@ -5,6 +5,7 @@ import org.gradle.internal.os.OperatingSystem
 plugins {
     alias(libs.plugins.kotlin.jvm)
     application
+    alias(libs.plugins.beryx.runtime)
 }
 
 application {
@@ -101,5 +102,70 @@ tasks.compileJava {
 tasks.compileKotlin {
     kotlinOptions {
         jvmTarget = libs.versions.jvm.target.get()
+    }
+}
+
+runtime {
+    options.set(listOf("--strip-debug", "--compress", "zip-9", "--no-header-files", "--no-man-pages"))
+    modules.set(
+        listOf(
+            "java.desktop",
+            "java.xml",
+            "jdk.unsupported",
+            "jdk.jfr",
+            "jdk.unsupported.desktop",
+            "java.datatransfer",
+            "java.scripting",
+            "java.rmi",
+            "java.sql",
+            "java.naming",
+            "java.compiler",
+            "java.logging",
+            "java.management"
+        )
+    )
+
+    launcher {
+        noConsole = true
+        jvmArgs = listOf(
+            "-XX:+PrintCommandLineFlags",
+            "-XX:+UseZGC",
+            "-XX:+ZGenerational",
+            "-Dsun.stdout.encoding=UTF-8",
+            "-Dsun.stderr.encoding=UTF-8",
+        )
+    }
+
+    jpackage {
+        imageName = application.applicationName
+
+        val currentOS = OperatingSystem.current()
+        if (currentOS.isMacOsX) {
+            imageOptions.addAll(listOf("--icon", "src/main/resources/application.icns"))
+        }
+        if (currentOS.isWindows) {
+            imageOptions.addAll(listOf("--icon", "src/main/resources/application.ico"))
+            installerOptions.addAll(
+                listOf(
+                    "--win-dir-chooser",
+                    "--win-menu",
+                    "--win-shortcut",
+                    "--install-dir",
+                    application.applicationName
+                )
+            )
+        }
+        if (currentOS.isLinux) {
+            imageOptions.addAll(listOf("--icon", "src/main/resources/application.png"))
+            installerOptions.addAll(
+                listOf(
+                    "--linux-deb-maintainer",
+                    "icuxika@outlook.com",
+                    "--linux-menu-group",
+                    application.applicationName,
+                    "--linux-shortcut"
+                )
+            )
+        }
     }
 }

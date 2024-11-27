@@ -1,5 +1,5 @@
 [versions]
-project-version = "0.0.1"
+project-version = "0.0.2-SNAPSHOT"
 jvm-target = "21"
 javafx-version = "22"
 

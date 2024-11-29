@@ -1,0 +1,5 @@
+@import "../fonts/Fonts.css";
+
+.text {
+    -fx-font-smoothing-type: gray;
+}

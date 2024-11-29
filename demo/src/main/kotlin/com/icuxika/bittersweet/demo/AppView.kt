@@ -2,6 +2,7 @@ package com.icuxika.bittersweet.demo
 
 import com.icuxika.bittersweet.demo.annotation.AppFXML
 import com.icuxika.bittersweet.demo.system.Theme
+import com.icuxika.bittersweet.demo.util.isWindows
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.Scene
@@ -66,16 +67,26 @@ class AppView<T : Any>(controllerClass: KClass<T>) {
         }
 
         fun reloadStylesheets(scene: Scene, id: String, theme: Theme) {
+            loadFixStylesheets(scene)
             val light = "css/light/$id-light.css"
             val dark = "css/dark/$id-dark.css"
             AppResource.loadURL(light)?.let { lightStylesheet ->
                 AppResource.loadURL(dark)?.let { darkStylesheet ->
                     scene.stylesheets.clear()
+                    loadFixStylesheets(scene)
                     if (theme == Theme.LIGHT) {
                         scene.stylesheets.add(lightStylesheet.toExternalForm())
                     } else {
                         scene.stylesheets.add(darkStylesheet.toExternalForm())
                     }
+                }
+            }
+        }
+
+        fun loadFixStylesheets(scene: Scene) {
+            if (isWindows()) {
+                AppResource.loadURL("css/bittersweet-fix.css")?.let { fixStylesheet ->
+                    scene.stylesheets.add(fixStylesheet.toExternalForm())
                 }
             }
         }

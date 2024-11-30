@@ -89,8 +89,8 @@ publishing {
 
         repositories {
             maven {
-                val releasesRepoUrl = uri("http://localhost:8081/repository/maven-releases/")
-                val snapshotsRepoUrl = uri("http://localhost:8081/repository/maven-snapshots/")
+                val releasesRepoUrl = uri("http://192.168.50.139:8081/repository/maven-releases/")
+                val snapshotsRepoUrl = uri("http://192.168.50.139:8081/repository/maven-snapshots/")
                 url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
                 // .\gradlew.bat :bittersweet:publish -PmavenUsername=username -PmavenPassword=password
                 credentials(PasswordCredentials::class)

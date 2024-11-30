@@ -6,3 +6,7 @@
     -fx-background-radius: 4px;
     -fx-background-insets: 0px;
 }
+
+.k-button .k-button-badge {
+    -fx-font-size: 12px !important;
+}

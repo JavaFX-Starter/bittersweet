@@ -17,6 +17,7 @@ import io.github.palexdev.materialfx.i18n.I18N
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon
 import io.github.palexdev.virtualizedfx.cell.Cell
 import javafx.beans.binding.When
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
@@ -50,6 +51,7 @@ class MainController : Initializable {
     private val scope = CoroutineScope(Dispatchers.JavaFx)
 
     private val progressProperty = SimpleDoubleProperty(ProgressIndicator.INDETERMINATE_PROGRESS)
+    private val cButtonBadgeVisibleProperty = SimpleBooleanProperty(true)
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         container.sceneProperty().addListener { _, oldScene, newScene ->
@@ -222,6 +224,15 @@ class MainController : Initializable {
             KButton("动感光波", 128.0, 32.0).apply {
                 styleClass.add("k-button-primary")
                 textFill = Color.WHITE
+                onAction {
+                    cButtonBadgeVisibleProperty.set(!cButtonBadgeVisibleProperty.get())
+                }
+            },
+            KButton("动感光波", 128.0, 32.0).apply {
+                styleClass.add("k-button-primary")
+                textFill = Color.WHITE
+                buttonBadgeVisibleProperty().bind(cButtonBadgeVisibleProperty)
+                setButtonBadgeText("77")
             }
         ).apply {
             alignment = Pos.CENTER

@@ -6,5 +6,6 @@
 }
 
 .k-button-primary {
-    -k-button-background: dodgerblue;
+    -k-button-background: linear-gradient(from 0.0% 0.0% to 100.0% 0.0%, #2f8df3ff 0.0%, #00eeffff 100.0%);
+    -k-button-badge-background: #d03050
 }

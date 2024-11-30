@@ -1,5 +1,6 @@
 package com.icuxika.bittersweet.demo.controller
 
+import com.icuxika.bittersweet.control.KButton
 import com.icuxika.bittersweet.demo.AppResource
 import com.icuxika.bittersweet.demo.AppView
 import com.icuxika.bittersweet.demo.annotation.AppFXML
@@ -217,6 +218,12 @@ class MainController : Initializable {
                     letsPlotView.show()
                     (container.scene.window as Stage).close()
                 }
+            },
+            KButton("动感光波", 128.0, 32.0).apply {
+                style = """
+                    -fx-font-size: 2em;
+                """.trimIndent()
+                textFill = Color.WHITE
             }
         ).apply {
             alignment = Pos.CENTER

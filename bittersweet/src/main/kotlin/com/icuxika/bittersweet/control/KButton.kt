@@ -4,10 +4,19 @@ import com.icuxika.bittersweet.skin.KButtonSkin
 import javafx.scene.control.Button
 import javafx.scene.control.Skin
 
-class KButton : Button() {
+class KButton() : Button() {
 
     init {
         styleClass.add(STYLE_CLASS)
+    }
+
+    constructor(text: String) : this() {
+        super.setText(text)
+    }
+
+    constructor(text: String, prefWidth: Double, prefHeight: Double) : this() {
+        super.setText(text)
+        super.setPrefSize(prefWidth, prefHeight)
     }
 
     override fun createDefaultSkin(): Skin<*> = KButtonSkin(this)

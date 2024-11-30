@@ -4,3 +4,7 @@
     -fx-background-color: dodgerblue;
     -fx-text-fill: white;
 }
+
+.k-button-primary {
+    -k-button-background: dodgerblue;
+}

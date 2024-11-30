@@ -5,8 +5,12 @@ import javafx.animation.KeyFrame
 import javafx.animation.KeyValue
 import javafx.animation.Timeline
 import javafx.beans.binding.Bindings
+import javafx.geometry.Insets
 import javafx.scene.control.skin.ButtonSkin
 import javafx.scene.input.MouseEvent
+import javafx.scene.layout.Background
+import javafx.scene.layout.BackgroundFill
+import javafx.scene.layout.CornerRadii
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
@@ -20,13 +24,14 @@ class KButtonSkin(kButton: KButton) : ButtonSkin(kButton) {
     private val queue: Queue<Circle> = LinkedList()
 
     private val stackPane = StackPane().apply {
-        style = """
-            -fx-background-color: dodgerblue;
-        """.trimIndent()
     }
 
     init {
         children.add(0, stackPane)
+
+        kButton.buttonBackgroundProperty().addListener { _, _, newValue ->
+            stackPane.background = Background(BackgroundFill(newValue, CornerRadii.EMPTY, Insets.EMPTY))
+        }
 
         kButton.addEventHandler(MouseEvent.MOUSE_PRESSED) { event ->
             val centerX = event.x

@@ -220,9 +220,7 @@ class MainController : Initializable {
                 }
             },
             KButton("动感光波", 128.0, 32.0).apply {
-                style = """
-                    -fx-font-size: 2em;
-                """.trimIndent()
+                styleClass.add("k-button-primary")
                 textFill = Color.WHITE
             }
         ).apply {

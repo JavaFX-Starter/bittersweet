@@ -24,12 +24,10 @@ plugin-beryx-jlink-version = "3.1.0"
 plugin-beryx-runtime-version = "1.13.1"
 
 [libraries]
-# bom
-kotlin-bom = { group = "org.jetbrains.kotlin", name = "kotlin-bom" }
 # kotlin
-kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib" }
-kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect" }
-kotlin-test-junit5 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5" }
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "plugin-kotlin-jvm-version" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "plugin-kotlin-jvm-version" }
+kotlin-test-junit5 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "plugin-kotlin-jvm-version" }
 
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core-version" }
 kotlinx-coroutines-javafx = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-javafx", version.ref = "kotlinx-coroutines-core-version" }

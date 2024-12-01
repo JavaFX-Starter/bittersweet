@@ -1,6 +1,8 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 import org.gradle.internal.os.OperatingSystem
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
@@ -45,7 +47,6 @@ val platform = when {
 }
 
 dependencies {
-    implementation(platform(libs.kotlin.bom))
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.reflect)
     testImplementation(libs.kotlin.test.junit5)
@@ -99,9 +100,10 @@ tasks.compileJava {
     options.release.set(libs.versions.jvm.target.get().toInt())
 }
 
-tasks.compileKotlin {
-    kotlinOptions {
-        jvmTarget = libs.versions.jvm.target.get()
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvm.target.get()))
+        languageVersion.set(KotlinVersion.KOTLIN_2_1)
     }
 }
 

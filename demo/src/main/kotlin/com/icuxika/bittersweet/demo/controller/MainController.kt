@@ -228,11 +228,16 @@ class MainController : Initializable {
                     cButtonBadgeVisibleProperty.set(!cButtonBadgeVisibleProperty.get())
                 }
             },
-            KButton("动感光波", 128.0, 32.0).apply {
+            KButton("帧率图表", 128.0, 32.0).apply {
                 styleClass.add("k-button-primary")
                 textFill = Color.WHITE
                 buttonBadgeVisibleProperty().bind(cButtonBadgeVisibleProperty)
                 setButtonBadgeText("77")
+                onAction { event ->
+                    val framerateRecorderView = AppView(FramerateRecorderController::class)
+                    framerateRecorderView.show()
+                    (container.scene.window as Stage).close()
+                }
             }
         ).apply {
             alignment = Pos.CENTER

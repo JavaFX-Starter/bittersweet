@@ -9,18 +9,16 @@ import com.icuxika.bittersweet.demo.system.Theme
 import com.icuxika.bittersweet.demo.util.FileDownloader
 import com.icuxika.bittersweet.dsl.onAction
 import com.icuxika.bittersweet.extension.logger
-import io.github.palexdev.materialfx.controls.MFXButton
-import io.github.palexdev.materialfx.controls.MFXProgressBar
-import io.github.palexdev.materialfx.enums.ButtonType
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.*
-import javafx.scene.layout.*
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.StackPane
+import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 import javafx.util.Callback
@@ -58,14 +56,11 @@ class MainController : Initializable {
         }
 
         container.center = VBox(
-            MFXProgressBar().apply {
+            ProgressBar().apply {
                 progressProperty().bind(progressProperty)
             },
-            MFXButton("下载").apply {
+            Button("下载").apply {
                 styleClass.add("test-button")
-                buttonType = ButtonType.FLAT
-                textFill = Color.WHITE
-                background = Background(BackgroundFill(Color.DODGERBLUE, CornerRadii(4.0), Insets.EMPTY))
                 onAction {
                     scope.launch {
                         val fileURL =
@@ -102,6 +97,7 @@ class MainController : Initializable {
                                 null
                             } else {
                                 Label().apply {
+                                    textFill = Color.BLACK
                                     textProperty().bind(AppResource.getLanguageBinding(item.value))
                                 }
                             }
@@ -130,6 +126,7 @@ class MainController : Initializable {
                                     else -> throw IllegalArgumentException("不支持的语言[${item.displayName}]")
                                 }
                                 Label().apply {
+                                    textFill = Color.BLACK
                                     textProperty().bind(AppResource.getLanguageBinding(key))
                                 }
                             }

@@ -18,6 +18,7 @@ lets-plot-kotlin-version = "4.7.2"
 geotools-version = "30.1"
 okhttp-version = "4.12.0"
 gson-version = "2.10.1"
+fxgl-version = "21.1"
 
 plugin-kotlin-jvm-version = "2.1.0"
 plugin-beryx-jlink-version = "3.1.0"
@@ -34,9 +35,12 @@ kotlinx-coroutines-javafx = { group = "org.jetbrains.kotlinx", name = "kotlinx-c
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines-core-version" }
 kotlinx-dataframe = { group = "org.jetbrains.kotlinx", name = "dataframe", version.ref = "kotlinx-dataframe-version" }
 kotlinx-datetime-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime-jvm", version.ref = "kotlinx-datetime-jvm-version" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json-version" }
 
 # javafx ui
 materialfx = { group = "io.github.palexdev", name = "materialfx", version.ref = "materialfx-version" }
+
+fxgl = { group = "com.github.almasb", name = "fxgl", version.ref = "fxgl-version" }
 
 # Lets-Plot
 lets-plot-jfx = { group = "org.jetbrains.lets-plot", name = "lets-plot-jfx", version.ref = "lets-plot-version" }

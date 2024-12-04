@@ -51,11 +51,14 @@ dependencies {
     implementation(libs.kotlin.reflect)
     testImplementation(libs.kotlin.test.junit5)
     testImplementation(libs.kotlinx.coroutines.test)
-    implementation(libs.kotlinx.dataframe)
+    implementation(libs.kotlinx.dataframe) {
+        exclude(group = "org.slf4j", module = "slf4j-simple")
+    }
     implementation(libs.kotlinx.datetime.jvm)
     implementation(project(":bittersweet"))
 
     implementation(libs.materialfx)
+    implementation(libs.fxgl)
 
     implementation(libs.bundles.lets.plot)
     implementation(libs.bundles.logback)

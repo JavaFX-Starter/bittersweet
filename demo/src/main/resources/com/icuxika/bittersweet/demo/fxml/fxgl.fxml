@@ -3,9 +3,9 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 <StackPane fx:id="rootContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-           prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.icuxika.bittersweet.demo.controller.FXGLController">
     <children>
-        <BorderPane fx:id="container" prefHeight="200.0" prefWidth="200.0"/>
+        <BorderPane fx:id="container"/>
     </children>
 </StackPane>

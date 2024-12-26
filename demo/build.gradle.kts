@@ -89,8 +89,9 @@ tasks.test {
     }
 }
 
-// 未生效的话，重新执行clean build run
+// .\gradlew.bat :demo:run -Penv=production
 tasks.processResources {
+    inputs.property("env", project.properties["env"])
     filesMatching("application.properties") {
         expand(project.properties)
     }

@@ -46,10 +46,10 @@ suspend inline fun <reified T> suspendPost(
         }.execute()
 }
 
-sealed class ProgressFlowState {
-    data class Progress(val progress: Double) : ProgressFlowState()
-    data class Success(val result: Any? = null) : ProgressFlowState()
-    data class Error(val throwable: Throwable) : ProgressFlowState()
+sealed class ProgressFlowState<T> {
+    data class Progress<T>(val progress: Double) : ProgressFlowState<T>()
+    data class Success<T>(val result: T? = null) : ProgressFlowState<T>()
+    data class Error<T>(val throwable: Throwable) : ProgressFlowState<T>()
 }
 
 /**
@@ -59,7 +59,7 @@ suspend fun suspendGetFileFlow(
     url: String,
     filePath: Path,
     data: Any? = null,
-) = callbackFlow {
+) = callbackFlow<ProgressFlowState<Int>> {
     val result = runCatching {
         suspendCancellableCoroutine { cancellableContinuation ->
             val type = object : TypeToken<Pair<InputStream, Double>>() {}.type
@@ -109,7 +109,7 @@ suspend fun suspendGetFileFlow(
 suspend inline fun <reified T> suspendPostFileFlow(
     url: String,
     data: Any? = null,
-) = callbackFlow<ProgressFlowState> {
+) = callbackFlow<ProgressFlowState<T>> {
     val result = runCatching {
         suspendCancellableCoroutine { cancellableContinuation ->
             val type = object : TypeToken<T>() {}.type

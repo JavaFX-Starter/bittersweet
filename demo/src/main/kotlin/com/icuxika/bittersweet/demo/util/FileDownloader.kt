@@ -18,8 +18,8 @@ import java.nio.file.Path
  * 使用Flow来实现文件下载的逻辑
  */
 object FileDownloader {
-    suspend fun downloadFile(fileURL: String, filePath: Path): Flow<ProgressFlowState> {
-        return flow {
+    suspend fun downloadFile(fileURL: String, filePath: Path): Flow<ProgressFlowState<Double>> {
+        return flow<ProgressFlowState<Double>> {
             val byteBuffer = ByteBuffer.allocate(1024)
             runCatching {
                 URI(fileURL).toURL()
@@ -50,7 +50,7 @@ object FileDownloader {
                                     byteBuffer.clear()
                                 }
                                 fileOutputStream.flush()
-                                emit(ProgressFlowState.Success(0))
+                                emit(ProgressFlowState.Success(0.0))
                             }
                         }
                     }

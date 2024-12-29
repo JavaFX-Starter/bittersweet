@@ -54,7 +54,7 @@ dependencies {
     implementation(libs.kotlinx.dataframe) {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
-    implementation(libs.kotlinx.datetime.jvm)
+    implementation(libs.kotlinx.datetime)
     implementation(project(":bittersweet"))
 
     implementation(libs.materialfx)

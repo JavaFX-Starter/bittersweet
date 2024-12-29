@@ -1,0 +1,6 @@
+ktor:
+  application:
+    modules:
+      - com.icuxika.bittersweet.server.ModulesKt.module
+  deployment:
+    port: 8080

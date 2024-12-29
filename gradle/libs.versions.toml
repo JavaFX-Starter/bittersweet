@@ -1,12 +1,14 @@
 [versions]
 project-version = "0.0.2-SNAPSHOT"
+kotlin-version = "2.1.0"
 jvm-target = "21"
 javafx-version = "22"
 
 kotlinx-coroutines-core-version = "1.9.0"
 kotlinx-dataframe-version = "0.14.1"
-kotlinx-datetime-jvm-version = "0.6.1"
+kotlinx-datetime-version = "0.6.1"
 kotlinx-serialization-json-version = "1.7.3"
+ktor-version = "3.0.2"
 
 slf4j2-version = "2.0.12"
 log4j-version = "2.23.0"
@@ -20,26 +22,37 @@ okhttp-version = "4.12.0"
 gson-version = "2.10.1"
 fxgl-version = "21.1"
 
-plugin-kotlin-jvm-version = "2.1.0"
 plugin-beryx-jlink-version = "3.1.0"
 plugin-beryx-runtime-version = "1.13.1"
 
 [libraries]
 # kotlin
-kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "plugin-kotlin-jvm-version" }
-kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "plugin-kotlin-jvm-version" }
-kotlin-test-junit5 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "plugin-kotlin-jvm-version" }
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin-version" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin-version" }
+kotlin-test-junit5 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "kotlin-version" }
 
+# kotlinx
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core-version" }
 kotlinx-coroutines-javafx = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-javafx", version.ref = "kotlinx-coroutines-core-version" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines-core-version" }
 kotlinx-dataframe = { group = "org.jetbrains.kotlinx", name = "dataframe", version.ref = "kotlinx-dataframe-version" }
-kotlinx-datetime-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime-jvm", version.ref = "kotlinx-datetime-jvm-version" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime-version" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json-version" }
+
+# ktor
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor-version" }
+ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor-version" }
+ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor-version" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json-jvm", version.ref = "ktor-version" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor-version" }
+ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml-jvm", version.ref = "ktor-version" }
+ktor-server-test-host = { module = "io.ktor:ktor-server-test-host-jvm", version.ref = "ktor-version" }
+
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation-jvm", version.ref = "ktor-version" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor-version" }
 
 # javafx ui
 materialfx = { group = "io.github.palexdev", name = "materialfx", version.ref = "materialfx-version" }
-
 fxgl = { group = "com.github.almasb", name = "fxgl", version.ref = "fxgl-version" }
 
 # Lets-Plot
@@ -69,9 +82,11 @@ log4j = ["log4j-api", "log4j-core", "log4j-slf4j2-impl"]
 logback = ["logback-classic", "logback-core"]
 lets-plot = ["lets-plot-jfx", "lets-plot-kotlin-jvm", "lets-plot-kotlin-geotools", "gt-shapefile", "gt-geojson", "gt-cql"]
 okhttp = ["okhttp", "gson"]
+ktor-server = ["ktor-server-content-negotiation", "ktor-server-core", "ktor-server-resources", "ktor-serialization-kotlinx-json", "ktor-server-netty", "ktor-server-config-yaml", "ktor-server-test-host"]
 
 [plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "plugin-kotlin-jvm-version" }
-kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "plugin-kotlin-jvm-version" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-version" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }
 beryx-jlink = { id = "org.beryx.jlink", version.ref = "plugin-beryx-jlink-version" }
 beryx-runtime = { id = "org.beryx.runtime", version.ref = "plugin-beryx-runtime-version" }

@@ -4,28 +4,32 @@ import com.icuxika.bittersweet.control.KButton
 import com.icuxika.bittersweet.demo.AppResource
 import com.icuxika.bittersweet.demo.AppView
 import com.icuxika.bittersweet.demo.annotation.AppFXML
-import com.icuxika.bittersweet.demo.api.ProgressFlowState
+import com.icuxika.bittersweet.demo.api.*
 import com.icuxika.bittersweet.demo.system.Theme
 import com.icuxika.bittersweet.demo.util.FileDownloader
 import com.icuxika.bittersweet.dsl.onAction
 import com.icuxika.bittersweet.extension.logger
+import javafx.beans.binding.When
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
+import javafx.scene.text.Text
 import javafx.stage.Stage
 import javafx.util.Callback
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.javafx.JavaFx
-import kotlinx.coroutines.launch
+import java.io.File
 import java.net.URL
 import java.nio.file.Path
 import java.util.*
@@ -41,8 +45,32 @@ class MainController : Initializable {
 
     private val scope = CoroutineScope(Dispatchers.JavaFx)
 
+    private lateinit var job: Job
+    private val downloadUrl = "https://dldir1.qq.com/qqfile/qq/QQNT/Windows/QQ_9.9.9_240403_x64_01.exe"
+    private val savePath = Path.of(System.getProperty("user.home")).resolve("Downloads").resolve("temp")
+        .resolve("QQ.exe")
+
     private val progressProperty = SimpleDoubleProperty(ProgressIndicator.INDETERMINATE_PROGRESS)
     private val cButtonBadgeVisibleProperty = SimpleBooleanProperty(true)
+
+    private suspend fun Flow<ProgressFlowState<Double>>.resolveFlowCollector() {
+        collect {
+            when (it) {
+                is ProgressFlowState.Progress -> {
+                    progressProperty.set(it.progress)
+                }
+
+                is ProgressFlowState.Success -> {
+                    LOGGER.info("下载完成[${Thread.currentThread().name}]-->${it.result}")
+                    LOGGER.info("文件保存路径->$savePath")
+                }
+
+                is ProgressFlowState.Error -> {
+                    LOGGER.info("下载失败[${Thread.currentThread().name}]-->${it.throwable.message}")
+                }
+            }
+        }
+    }
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         container.sceneProperty().addListener { _, oldScene, newScene ->
@@ -59,33 +87,79 @@ class MainController : Initializable {
             ProgressBar().apply {
                 progressProperty().bind(progressProperty)
             },
-            Button("下载").apply {
-                styleClass.add("test-button")
-                onAction {
-                    scope.launch {
-                        val fileURL =
-                            "https://dldir1.qq.com/qqfile/qq/QQNT/Windows/QQ_9.9.9_240403_x64_01.exe"
-                        val filePath =
-                            Path.of(System.getProperty("user.home")).resolve("Downloads").resolve("temp")
-                                .resolve("result1.exe");
-                        FileDownloader.downloadFile(fileURL, filePath).collect {
-                            when (it) {
-                                is ProgressFlowState.Progress -> {
-                                    progressProperty.set(it.progress)
-                                }
+            HBox(
+                Button("下载1").apply {
+                    styleClass.add("test-button")
+                    onAction {
+                        job = scope.launch {
+                            FileDownloader.downloadFile(downloadUrl, savePath).resolveFlowCollector()
+                        }
+                    }
+                },
+                Button("下载2").apply {
+                    styleClass.add("test-button")
+                    onAction {
+                        job = scope.launch {
+                            suspendGetFileFlow(downloadUrl, savePath).resolveFlowCollector()
+                        }
+                    }
+                },
+                Button("取消").apply {
+                    styleClass.add("test-button")
+                    onAction {
+                        scope.launch {
+                            job.cancelAndJoin()
+                            progressProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS)
+                            savePath.toFile().delete()
+                        }
+                    }
+                },
+            ).apply {
+                alignment = Pos.CENTER
+                spacing = 12.0
+            },
+            Text().apply {
+                textProperty().bind(
+                    SimpleStringProperty("进度: ").concat(
+                        When(
+                            progressProperty.isEqualTo(
+                                SimpleDoubleProperty(ProgressIndicator.INDETERMINATE_PROGRESS)
+                            )
+                        ).then(SimpleStringProperty("0"))
+                            .otherwise(progressProperty.multiply(100).asString("%.2f"))
+                    ).concat("%")
+                )
+            },
+            HBox(
+                Button("上传").apply {
+                    onAction {
+                        job = scope.launch {
+                            suspendPostFileFlow<ApiData<Unit>>(
+                                "http://127.0.0.1:8080/users/upload", mapOf(
+                                    Api.REQUEST_KEY_FILE to File("C:\\Users\\icuxika\\Downloads\\openjdk-14.0.2_windows-x64_bin.zip"),
+                                    "id" to "11",
+                                )
+                            ).collect {
+                                when (it) {
+                                    is ProgressFlowState.Progress -> {
+                                        progressProperty.set(it.progress)
+                                    }
 
-                                is ProgressFlowState.Success -> {
-                                    LOGGER.info("下载完成[${Thread.currentThread().name}]-->${it.result}")
-                                    LOGGER.info("文件保存路径->$filePath")
-                                }
+                                    is ProgressFlowState.Error -> {
+                                        LOGGER.info("上传失败[${Thread.currentThread().name}]-->${it.throwable.message}")
+                                    }
 
-                                is ProgressFlowState.Error -> {
-                                    LOGGER.info("下载失败[${Thread.currentThread().name}]-->${it.throwable.message}")
+                                    is ProgressFlowState.Success -> {
+                                        println(it.result)
+                                    }
                                 }
                             }
                         }
                     }
-                }
+                },
+            ).apply {
+                alignment = Pos.CENTER
+                spacing = 12.0
             },
             ComboBox(FXCollections.observableArrayList(Theme.entries)).apply {
                 valueProperty().bindBidirectional(AppResource.themeProperty())

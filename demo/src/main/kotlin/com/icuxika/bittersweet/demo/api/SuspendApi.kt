@@ -3,8 +3,13 @@ package com.icuxika.bittersweet.demo.api
 import com.google.gson.reflect.TypeToken
 import com.icuxika.bittersweet.demo.api.Api.HTTPRequestMethod
 import javafx.scene.control.ProgressIndicator
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okio.use
 import java.io.BufferedInputStream
@@ -55,11 +60,11 @@ sealed class ProgressFlowState<T> {
 /**
  * 获取文件流并保存到指定Path
  */
-suspend fun suspendGetFileFlow(
+fun suspendGetFileFlow(
     url: String,
     filePath: Path,
     data: Any? = null,
-) = callbackFlow<ProgressFlowState<Int>> {
+) = callbackFlow<ProgressFlowState<Double>> {
     val result = runCatching {
         suspendCancellableCoroutine { cancellableContinuation ->
             val type = object : TypeToken<Pair<InputStream, Double>>() {}.type
@@ -79,12 +84,15 @@ suspend fun suspendGetFileFlow(
                 var bytesAllRead = 0
                 var bytesRead: Int
                 while (bufferedInputStream.read(buffer).also { bytesRead = it } != -1) {
+                    if (!isActive) {
+                        throw CancellationException("cancel")
+                    }
                     fileOutputStream.write(buffer, 0, bytesRead)
                     bytesAllRead += bytesRead
                     if (contentLength == ProgressIndicator.INDETERMINATE_PROGRESS) {
                         trySend(ProgressFlowState.Progress(contentLength))
                     } else {
-                        trySend(
+                        trySendBlocking(
                             ProgressFlowState.Progress(
                                 (bytesAllRead.toDouble() / contentLength).coerceIn(0.0, 1.0)
                             )
@@ -92,7 +100,7 @@ suspend fun suspendGetFileFlow(
                     }
                 }
                 fileOutputStream.flush()
-                send(ProgressFlowState.Success(0))
+                send(ProgressFlowState.Success(0.0))
             }
         }
     }
@@ -100,13 +108,13 @@ suspend fun suspendGetFileFlow(
         send(ProgressFlowState.Error(it))
     }
     close()
-    awaitClose { }
-}
+    awaitClose {}
+}.flowOn(Dispatchers.IO)
 
 /**
  * 上传文件并同时监听进度，监听器会在请求真正发起之前就被调用
  */
-suspend inline fun <reified T> suspendPostFileFlow(
+inline fun <reified T> suspendPostFileFlow(
     url: String,
     data: Any? = null,
 ) = callbackFlow<ProgressFlowState<T>> {
@@ -140,4 +148,4 @@ suspend inline fun <reified T> suspendPostFileFlow(
     }
     close()
     awaitClose { }
-}
+}.flowOn(Dispatchers.IO)

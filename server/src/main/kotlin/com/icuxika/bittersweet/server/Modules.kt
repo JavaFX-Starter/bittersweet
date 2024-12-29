@@ -46,7 +46,7 @@ fun Application.module() {
         }
         post<Users.Upload> {
             val receivedFiles = arrayListOf<Pair<String, Int>>()
-            val multipartData = call.receiveMultipart()
+            val multipartData = call.receiveMultipart(formFieldLimit = 200 * 1024 * 1024)
             multipartData.forEachPart { part ->
                 val fileName: String
                 val fileSize: Int

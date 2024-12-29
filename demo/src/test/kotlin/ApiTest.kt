@@ -1,6 +1,4 @@
 import com.icuxika.bittersweet.demo.api.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.test.runTest
 import java.io.File
 import java.nio.file.Path
@@ -80,7 +78,7 @@ class ApiTest {
                 Api.REQUEST_KEY_FILE to File("build.gradle.kts"),
                 "id" to "11",
             )
-        ).flowOn(Dispatchers.IO).collect {
+        ).collect {
             when (it) {
                 is ProgressFlowState.Progress -> {
                     println(it.progress)
@@ -102,7 +100,7 @@ class ApiTest {
         suspendGetFileFlow(
             "http://127.0.0.1:8080/users/download",
             Path.of(System.getProperty("user.home")).resolve("Downloads").resolve("temp").resolve("build.gradle.kts")
-        ).flowOn(Dispatchers.IO).collect {
+        ).collect {
             when (it) {
                 is ProgressFlowState.Progress -> {
                     println(it.progress)

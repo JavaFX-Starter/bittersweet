@@ -124,7 +124,7 @@ inline fun <reified T> suspendPostFileFlow(
             Api.request<T>(type, url, HTTPRequestMethod.POST, mutableMapOf<String, Any>(
                 Api.REQUEST_KEY_LISTENER to object : RequestListener {
                     override fun invoke(workDone: Long, max: Long) {
-                        trySend(ProgressFlowState.Progress(workDone.toDouble() / max))
+                        trySendBlocking(ProgressFlowState.Progress(workDone.toDouble() / max))
                     }
                 }
             ).apply {

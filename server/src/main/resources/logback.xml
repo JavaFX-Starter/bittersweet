@@ -2,8 +2,7 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %highlight(%-5level) %boldGreen(%d{yyyy-MM-dd HH:mm:ss.SSS}) %boldYellow([%thread]) %cyan([%F:%L]) -
-                %highlight(%msg%n)
+                %highlight(%-5level) %boldGreen(%d{yyyy-MM-dd HH:mm:ss.SSS}) %boldYellow([%thread]) %cyan([%F:%L]) - %highlight(%msg%n)
             </pattern>
         </encoder>
     </appender>

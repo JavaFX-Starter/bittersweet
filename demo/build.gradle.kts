@@ -89,9 +89,10 @@ tasks.test {
     }
 }
 
-// .\gradlew.bat :demo:run -Penv=production
+// .\gradlew.bat :demo:run -Penv=production -Pserver="http://127.0.0.1:8080"
 tasks.processResources {
     inputs.property("env", project.properties["env"])
+    inputs.property("server", project.properties["server"])
     filesMatching("application.properties") {
         expand(project.properties)
     }

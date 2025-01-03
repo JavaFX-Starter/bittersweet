@@ -2,6 +2,7 @@ package com.icuxika.bittersweet.demo
 
 import com.icuxika.bittersweet.demo.MainApp.Companion.LOGGER
 import com.icuxika.bittersweet.demo.controller.MainController
+import com.icuxika.bittersweet.demo.system.SystemProperties
 import com.icuxika.bittersweet.demo.system.Theme
 import com.icuxika.bittersweet.extension.logger
 import javafx.application.Application
@@ -13,6 +14,8 @@ fun main(args: Array<String>) {
         Properties().apply { load(it) }
     }.let { properties ->
         LOGGER.info("当前环境：${properties["environment"]}")
+        SystemProperties.serverUrl = properties["serverUrl"] as String
+        LOGGER.info("服务器地址：${SystemProperties.serverUrl}")
     }
     Application.launch(MainApp::class.java, *args)
 }

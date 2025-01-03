@@ -170,18 +170,22 @@ class ApiExecutor<T>(private val request: Request, private val type: Type) {
      * 执行请求并根据类型解析响应
      */
     fun execute() {
-        val dataType = type as? ParameterizedType
-            ?: throw RuntimeException("Type [${type.typeName}] is not a ParameterizedType")
-        val actualTypeArguments = dataType.actualTypeArguments
-        if (actualTypeArguments.isEmpty()) {
-            throw RuntimeException("Type [${dataType.typeName}]'s actualTypeArguments is Empty")
-        }
-        okHttpClient.newCall(request).execute().use { response ->
-            if (response.isSuccessful) {
-                resolveResponse(response, type)
-            } else {
-                doFailure(IOException("Unexpected code $response"))
+        runCatching {
+            val dataType = type as? ParameterizedType
+                ?: throw RuntimeException("Type [${type.typeName}] is not a ParameterizedType")
+            val actualTypeArguments = dataType.actualTypeArguments
+            if (actualTypeArguments.isEmpty()) {
+                throw RuntimeException("Type [${dataType.typeName}]'s actualTypeArguments is Empty")
             }
+            okHttpClient.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    resolveResponse(response, type)
+                } else {
+                    doFailure(IOException("Unexpected code $response"))
+                }
+            }
+        }.onFailure {
+            doFailure(RuntimeException(it))
         }
     }
 
@@ -189,15 +193,19 @@ class ApiExecutor<T>(private val request: Request, private val type: Type) {
      * 直接返回响应流，用于Get请求从后端下载流文件
      */
     fun stream() {
-        val response = okHttpClient.newCall(request).execute()
-        val responseBody = response.body
-        if (responseBody == null) {
-            doFailure(RuntimeException("请求响应体中没有文件数据"))
-        } else {
-            val contentLength: Double =
-                response.header("CONTENT-LENGTH")?.toDouble() ?: ProgressIndicator.INDETERMINATE_PROGRESS
-            @Suppress("UNCHECKED_CAST")
-            doSuccess(Pair(responseBody.byteStream(), contentLength) as T)
+        runCatching {
+            val response = okHttpClient.newCall(request).execute()
+            val responseBody = response.body
+            if (responseBody == null) {
+                doFailure(RuntimeException("请求响应体中没有文件数据"))
+            } else {
+                val contentLength: Double =
+                    response.header("CONTENT-LENGTH")?.toDouble() ?: ProgressIndicator.INDETERMINATE_PROGRESS
+                @Suppress("UNCHECKED_CAST")
+                doSuccess(Pair(responseBody.byteStream(), contentLength) as T)
+            }
+        }.onFailure {
+            doFailure(RuntimeException(it))
         }
     }
 

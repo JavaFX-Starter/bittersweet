@@ -6,7 +6,6 @@ import javafx.scene.control.ProgressIndicator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
@@ -65,48 +64,38 @@ fun suspendGetFileFlow(
     filePath: Path,
     data: Any? = null,
 ) = callbackFlow<ProgressFlowState<Double>> {
-    val result = runCatching {
-        suspendCancellableCoroutine { cancellableContinuation ->
-            val type = object : TypeToken<Pair<InputStream, Double>>() {}.type
-            Api.request<Pair<InputStream, Double>>(type, url, HTTPRequestMethod.GET, data)
-                .success {
-                    cancellableContinuation.resume(it)
-                }.failure {
-                    cancellableContinuation.resumeWithException(it)
-                }.stream()
-        }
-    }
-    result.getOrNull()?.let { pair ->
-        val (inputStream, contentLength) = pair
-        BufferedInputStream(inputStream).use { bufferedInputStream ->
-            FileOutputStream(filePath.toFile()).use { fileOutputStream ->
-                val buffer = ByteArray(1024)
-                var bytesAllRead = 0
-                var bytesRead: Int
-                while (bufferedInputStream.read(buffer).also { bytesRead = it } != -1) {
-                    if (!isActive) {
-                        throw CancellationException("cancel")
-                    }
-                    fileOutputStream.write(buffer, 0, bytesRead)
-                    bytesAllRead += bytesRead
-                    if (contentLength == ProgressIndicator.INDETERMINATE_PROGRESS) {
-                        trySend(ProgressFlowState.Progress(contentLength))
-                    } else {
-                        trySendBlocking(
-                            ProgressFlowState.Progress(
-                                (bytesAllRead.toDouble() / contentLength).coerceIn(0.0, 1.0)
+    val type = object : TypeToken<Pair<InputStream, Double>>() {}.type
+    Api.request<Pair<InputStream, Double>>(type, url, HTTPRequestMethod.GET, data)
+        .success { pair ->
+            val (inputStream, contentLength) = pair
+            BufferedInputStream(inputStream).use { bufferedInputStream ->
+                FileOutputStream(filePath.toFile()).use { fileOutputStream ->
+                    val buffer = ByteArray(1024)
+                    var bytesAllRead = 0
+                    var bytesRead: Int
+                    while (bufferedInputStream.read(buffer).also { bytesRead = it } != -1) {
+                        if (!isActive) {
+                            throw CancellationException("取消协程任务")
+                        }
+                        fileOutputStream.write(buffer, 0, bytesRead)
+                        bytesAllRead += bytesRead
+                        if (contentLength == ProgressIndicator.INDETERMINATE_PROGRESS) {
+                            trySend(ProgressFlowState.Progress(contentLength))
+                        } else {
+                            trySend(
+                                ProgressFlowState.Progress(
+                                    (bytesAllRead.toDouble() / contentLength).coerceIn(0.0, 1.0)
+                                )
                             )
-                        )
+                        }
                     }
+                    fileOutputStream.flush()
+                    trySend(ProgressFlowState.Success(0.0))
                 }
-                fileOutputStream.flush()
-                send(ProgressFlowState.Success(0.0))
             }
-        }
-    }
-    result.exceptionOrNull()?.let {
-        send(ProgressFlowState.Error(it))
-    }
+        }.failure {
+            trySend(ProgressFlowState.Error(it))
+        }.stream()
     close()
     awaitClose {}
 }.flowOn(Dispatchers.IO)
@@ -118,34 +107,28 @@ inline fun <reified T> suspendPostFileFlow(
     url: String,
     data: Any? = null,
 ) = callbackFlow<ProgressFlowState<T>> {
-    val result = runCatching {
-        suspendCancellableCoroutine { cancellableContinuation ->
-            val type = object : TypeToken<T>() {}.type
-            Api.request<T>(type, url, HTTPRequestMethod.POST, mutableMapOf<String, Any>(
-                Api.REQUEST_KEY_LISTENER to object : RequestListener {
-                    override fun invoke(workDone: Long, max: Long) {
-                        trySendBlocking(ProgressFlowState.Progress(workDone.toDouble() / max))
+    val type = object : TypeToken<T>() {}.type
+    Api.request<T>(
+        type, url, HTTPRequestMethod.POST, mutableMapOf<String, Any>(
+            Api.REQUEST_KEY_LISTENER to object : RequestListener {
+                override fun invoke(workDone: Long, max: Long) {
+                    if (!isActive) {
+                        throw CancellationException("取消协程任务")
                     }
+                    trySend(ProgressFlowState.Progress(workDone.toDouble() / max))
                 }
-            ).apply {
-                @Suppress("UNCHECKED_CAST")
-                (data as? Map<String, Any>)?.forEach { (k, v) ->
-                    this[k] = v
-                }
-            })
-                .success {
-                    cancellableContinuation.resume(it)
-                }.failure {
-                    cancellableContinuation.resumeWithException(it)
-                }.execute()
-        }
-    }
-    result.getOrNull()?.let {
-        send(ProgressFlowState.Success(it))
-    }
-    result.exceptionOrNull()?.let {
-        send(ProgressFlowState.Error(it))
-    }
+            }
+        ).apply {
+            @Suppress("UNCHECKED_CAST")
+            (data as? Map<String, Any>)?.forEach { (k, v) ->
+                this[k] = v
+            }
+        })
+        .success {
+            trySend(ProgressFlowState.Success(it))
+        }.failure {
+            trySend(ProgressFlowState.Error(it))
+        }.execute()
     close()
     awaitClose { }
 }.flowOn(Dispatchers.IO)

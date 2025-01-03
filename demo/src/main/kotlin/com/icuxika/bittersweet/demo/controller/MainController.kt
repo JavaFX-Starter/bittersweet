@@ -5,6 +5,7 @@ import com.icuxika.bittersweet.demo.AppResource
 import com.icuxika.bittersweet.demo.AppView
 import com.icuxika.bittersweet.demo.annotation.AppFXML
 import com.icuxika.bittersweet.demo.api.*
+import com.icuxika.bittersweet.demo.system.SystemProperties
 import com.icuxika.bittersweet.demo.system.Theme
 import com.icuxika.bittersweet.demo.util.FileDownloader
 import com.icuxika.bittersweet.dsl.onAction
@@ -24,12 +25,12 @@ import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
+import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.util.Callback
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.javafx.JavaFx
-import java.io.File
 import java.net.URL
 import java.nio.file.Path
 import java.util.*
@@ -91,7 +92,9 @@ class MainController : Initializable {
                 Button("下载1").apply {
                     styleClass.add("test-button")
                     onAction {
-                        job = scope.launch {
+                        job = scope.launch(CoroutineExceptionHandler { _, exception ->
+                            println("下载1 捕获到异常 ${exception.message}")
+                        }) {
                             FileDownloader.downloadFile(downloadUrl, savePath).resolveFlowCollector()
                         }
                     }
@@ -99,7 +102,9 @@ class MainController : Initializable {
                 Button("下载2").apply {
                     styleClass.add("test-button")
                     onAction {
-                        job = scope.launch {
+                        job = scope.launch(CoroutineExceptionHandler { _, exception ->
+                            println("下载2 捕获到异常 ${exception.message}")
+                        }) {
                             suspendGetFileFlow(downloadUrl, savePath).resolveFlowCollector()
                         }
                     }
@@ -107,7 +112,9 @@ class MainController : Initializable {
                 Button("取消").apply {
                     styleClass.add("test-button")
                     onAction {
-                        scope.launch {
+                        scope.launch(CoroutineExceptionHandler { _, exception ->
+                            println("取消 捕获到异常 ${exception.message}")
+                        }) {
                             job.cancelAndJoin()
                             progressProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS)
                             savePath.toFile().delete()
@@ -133,24 +140,28 @@ class MainController : Initializable {
             HBox(
                 Button("上传").apply {
                     onAction {
-                        job = scope.launch {
-                            suspendPostFileFlow<ApiData<Unit>>(
-                                "http://127.0.0.1:8080/users/upload", mapOf(
-                                    Api.REQUEST_KEY_FILE to File("C:\\Users\\icuxika\\Downloads\\openjdk-14.0.2_windows-x64_bin.zip"),
-                                    "id" to "11",
-                                )
-                            ).collect {
-                                when (it) {
-                                    is ProgressFlowState.Progress -> {
-                                        progressProperty.set(it.progress)
-                                    }
+                        FileChooser().apply {
+                            title = "选择大文件"
+                        }.showOpenDialog(container.scene.window)?.let { selectedFile ->
+                            job = scope.launch {
+                                suspendPostFileFlow<ApiData<Unit>>(
+                                    "${SystemProperties.serverUrl}/users/upload", mapOf(
+                                        Api.REQUEST_KEY_FILE to selectedFile,
+                                        "id" to "11",
+                                    )
+                                ).collect {
+                                    when (it) {
+                                        is ProgressFlowState.Progress -> {
+                                            progressProperty.set(it.progress)
+                                        }
 
-                                    is ProgressFlowState.Error -> {
-                                        LOGGER.info("上传失败[${Thread.currentThread().name}]-->${it.throwable.message}")
-                                    }
+                                        is ProgressFlowState.Error -> {
+                                            LOGGER.info("上传失败[${Thread.currentThread().name}]-->${it.throwable.message}")
+                                        }
 
-                                    is ProgressFlowState.Success -> {
-                                        println(it.result)
+                                        is ProgressFlowState.Success -> {
+                                            println(it.result)
+                                        }
                                     }
                                 }
                             }

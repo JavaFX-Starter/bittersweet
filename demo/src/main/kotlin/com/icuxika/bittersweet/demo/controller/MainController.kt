@@ -1,10 +1,13 @@
 package com.icuxika.bittersweet.demo.controller
 
 import com.icuxika.bittersweet.control.KButton
+import com.icuxika.bittersweet.demo.ApiRegistrar
 import com.icuxika.bittersweet.demo.AppResource
 import com.icuxika.bittersweet.demo.AppView
 import com.icuxika.bittersweet.demo.annotation.AppFXML
 import com.icuxika.bittersweet.demo.api.*
+import com.icuxika.bittersweet.demo.model.User
+import com.icuxika.bittersweet.demo.remote.UserClient
 import com.icuxika.bittersweet.demo.system.SystemProperties
 import com.icuxika.bittersweet.demo.system.Theme
 import com.icuxika.bittersweet.demo.util.FileDownloader
@@ -33,6 +36,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.javafx.JavaFx
 import java.net.URL
 import java.nio.file.Path
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.*
 
 @AppFXML(fxml = "fxml/main.fxml")
@@ -172,6 +178,31 @@ class MainController : Initializable {
                 alignment = Pos.CENTER
                 spacing = 12.0
             },
+            Button("调用UserClient").apply {
+                styleClass.add("test-button")
+                onAction {
+                    println(
+                        userClient.getUser(
+                            1,
+                            "client-get",
+                            LocalDate.of(2022, 12, 12),
+                            LocalTime.of(11, 11),
+                            LocalDateTime.of(2022, 12, 12, 11, 11)
+                        )
+                    )
+                    println(
+                        userClient.postUser(
+                            User(
+                                1,
+                                "client-post",
+                                LocalDate.of(2022, 12, 12),
+                                LocalTime.of(11, 11),
+                                LocalDateTime.of(2022, 12, 12, 11, 11)
+                            )
+                        )
+                    )
+                }
+            },
             ComboBox(FXCollections.observableArrayList(Theme.entries)).apply {
                 valueProperty().bindBidirectional(AppResource.themeProperty())
                 cellFactory = Callback<ListView<Theme>, ListCell<Theme>> {
@@ -265,5 +296,6 @@ class MainController : Initializable {
 
     companion object {
         val LOGGER = logger()
+        val userClient = ApiRegistrar.getProxy<UserClient>(UserClient::class)
     }
 }

@@ -24,6 +24,7 @@ fxgl-version = "21.1"
 
 plugin-beryx-jlink-version = "3.1.0"
 plugin-beryx-runtime-version = "1.13.1"
+plugin-shadow-version = "8.3.5"
 
 [libraries]
 # kotlin
@@ -90,3 +91,4 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }
 beryx-jlink = { id = "org.beryx.jlink", version.ref = "plugin-beryx-jlink-version" }
 beryx-runtime = { id = "org.beryx.runtime", version.ref = "plugin-beryx-runtime-version" }
+shadow = { id = "com.gradleup.shadow", version.ref = "plugin-shadow-version" }

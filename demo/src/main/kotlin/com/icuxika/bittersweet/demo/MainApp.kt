@@ -17,6 +17,7 @@ fun main(args: Array<String>) {
         SystemProperties.serverUrl = properties["serverUrl"] as String
         LOGGER.info("服务器地址：${SystemProperties.serverUrl}")
     }
+    ApiRegistrar().register("com.icuxika.bittersweet.demo.remote")
     Application.launch(MainApp::class.java, *args)
 }
 

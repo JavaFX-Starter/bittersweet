@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     application
     alias(libs.plugins.beryx.runtime)
+    alias(libs.plugins.shadow)
 }
 
 application {
@@ -109,6 +110,7 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvm.target.get()))
         languageVersion.set(KotlinVersion.KOTLIN_2_1)
+        javaParameters = true
     }
 }
 

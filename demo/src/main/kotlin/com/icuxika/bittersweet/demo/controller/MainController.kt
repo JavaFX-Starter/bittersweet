@@ -203,6 +203,13 @@ class MainController : Initializable {
                     )
                 }
             },
+            Button("启动画面").apply {
+                styleClass.add("test-button")
+                onAction {
+                    AppView(SplashScreenController::class).show()
+                    (container.scene.window as Stage).close()
+                }
+            },
             ComboBox(FXCollections.observableArrayList(Theme.entries)).apply {
                 valueProperty().bindBidirectional(AppResource.themeProperty())
                 cellFactory = Callback<ListView<Theme>, ListCell<Theme>> {

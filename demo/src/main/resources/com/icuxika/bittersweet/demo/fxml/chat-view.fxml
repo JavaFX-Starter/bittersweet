@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<StackPane fx:id="rootContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+           prefHeight="800.0" prefWidth="800.0" stylesheets="@../css/chat-view.css" xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.icuxika.bittersweet.demo.controller.ChatViewController">
+    <children>
+        <BorderPane fx:id="container"/>
+    </children>
+</StackPane>

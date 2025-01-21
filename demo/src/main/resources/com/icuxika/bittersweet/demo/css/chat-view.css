@@ -1,0 +1,27 @@
+@import "bittersweet.css";
+
+.message-list-view {
+}
+
+.message-list-view:focused {
+    -fx-background-color: transparent;
+}
+
+.message-list-view .list-cell {
+    -fx-background-color: transparent;
+}
+
+.message-list-view .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.message-list-view .scroll-bar:vertical > .thumb {
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+}
+
+.message-list-view .scroll-bar:vertical > .increment-button,
+.message-list-view .scroll-bar:vertical > .increment-button > .increment-arrow,
+.message-list-view .scroll-bar:vertical > .decrement-button,
+.message-list-view .scroll-bar:vertical > .decrement-button > .decrement-arrow {
+    -fx-background-color: transparent;
+}

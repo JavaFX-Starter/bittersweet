@@ -210,6 +210,13 @@ class MainController : Initializable {
                     (container.scene.window as Stage).close()
                 }
             },
+            Button("气泡消息").apply {
+                styleClass.add("test-button")
+                onAction {
+                    AppView(ChatViewController::class).show()
+                    (container.scene.window as Stage).close()
+                }
+            },
             ComboBox(FXCollections.observableArrayList(Theme.entries)).apply {
                 valueProperty().bindBidirectional(AppResource.themeProperty())
                 cellFactory = Callback<ListView<Theme>, ListCell<Theme>> {

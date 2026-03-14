@@ -22,7 +22,9 @@ application {
             "-Xlog:gc:logs/gc.log",
             "-Dsun.stdout.encoding=UTF-8",
             "-Dsun.stderr.encoding=UTF-8",
-            "-Dkotlinx.coroutines.debug"
+            "-Dkotlinx.coroutines.debug",
+            "-Dprism.vsync=false",
+            "-Djavafx.animation.fullspeed=true"
         )
 }
 

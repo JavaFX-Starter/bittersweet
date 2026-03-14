@@ -41,7 +41,7 @@ class FramerateRecorderController : Initializable {
     private val calculateTotalDuration = 1.0
 
     // 透明度递减量
-    private val transparencyDecrement = 0.005
+    private val transparencyDecrement = 0.001
 
     // 计算进度属性
     private val calculateProgress = SimpleDoubleProperty(calculateTotalDuration)
@@ -85,7 +85,7 @@ class FramerateRecorderController : Initializable {
                 (calculateTotalDuration / transparencyDecrement),
                 (calculateTotalDuration / transparencyDecrement) / 10.0
             ),
-            NumberAxis(0.0, 200.0, 20.0)
+            NumberAxis(0.0, 1000.0, 20.0)
         ).apply {
             animated = false
             createSymbols = false
